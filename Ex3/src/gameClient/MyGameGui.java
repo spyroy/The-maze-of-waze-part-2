@@ -1,5 +1,5 @@
 package gameClient;
 
-public class Robot {
+public class MyGameGui {
 
 }
