@@ -9,6 +9,7 @@ public class node implements node_data, Serializable {
 	private Point3D location;
 	private double weight;
 	private String info;
+	private static int _count;
 
 	public node () 
 	{
@@ -38,6 +39,10 @@ public class node implements node_data, Serializable {
 		this.weight=weight;
 		info="";
 	}
+	
+	public static void resetCount() {
+        node._count = 0;
+    }
 	
 	@Override
 	public int getKey()
