@@ -5,53 +5,55 @@ import org.json.JSONObject;
 import utils.Point3D;
 
 public class Robot implements RobotInterface {
+
 	private int id;
 	private double value;
 	private double speed;
-	private int source;
-	private int destination;
-
+	private int src;
+	private int dest;
 	private Point3D location;
-	private Point3D gui_location;
+	private Point3D GuiLocation;
 
 	public Robot() {
 	}
-	
-	public Robot(String str)
-    {
-        this();
-        try {
-            JSONObject robot = new JSONObject(str);
-            robot=robot.getJSONObject("Robot");
-            double val = robot.getDouble("value");
-            int src=robot.getInt("src");
-            int dst=robot.getInt("dest");
-            double speed=robot.getDouble("speed");
-            String pos=robot.getString("pos");
-            this.value=val;
-            this.location=new Point3D(pos);
-            this.source=src;
-            this.destination=dst;
-            this.speed=speed;
-            this.setGui_location(0,0);
-        }
-        catch (Exception e)
-        {
 
-            e.printStackTrace();
-        }
-    }
+	// constructor from JSON
+	public Robot(String str) {
+		this();
+		try {
+			JSONObject robot = new JSONObject(str);
+			robot = robot.getJSONObject("Robot");
+			double v = robot.getDouble("value");
+			int s = robot.getInt("src");
+			int d = robot.getInt("dest");
+			double speed = robot.getDouble("speed");
+			String p = robot.getString("pos");
+			this.value = v;
+			this.location = new Point3D(p);
+			this.src = s;
+			this.dest = d;
+			this.speed = speed;
+			this.setGui_location(0, 0);
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public String toJSON() {
-		 String ans = "{\"Robot\":{\"id\":" + this.id + "," + "\"value\":" + this.value + "," + "\"src\":" + this.source + "," + "\"dest\":" + this.destination + "," + "\"speed\":" + this.getSpeed() + "," + "\"pos\":\"" + this.location.toString() + "\"" + "}" + "}";
-	        return ans;
+		String ans = "{\"Robot\":{\"id\":" + this.id + "," + "\"value\":" + this.value + "," + "\"src\":" + this.src
+				+ "," + "\"dest\":" + this.dest + "," + "\"speed\":" + this.getSpeed() + "," + "\"pos\":\""
+				+ this.location.toString() + "\"" + "}" + "}";
+		return ans;
 	}
 
 	@Override
 	public String toJSON_OnGui() {
-		String ans = "{\"Robot\":{\"id\":" + this.id + "," + "\"value\":" + this.value + "," + "\"src\":" + this.source + "," + "\"dest\":" + this.destination + "," + "\"speed\":" + this.getSpeed() + "," + "\"pos\":\"" + this.location.toString() +"\"pos_gui\":\"" + this.getGui_location().toString() + "\"" + "}" + "}";
-        return ans;
+		String ans = "{\"Robot\":{\"id\":" + this.id + "," + "\"value\":" + this.value + "," + "\"src\":" + this.src
+				+ "," + "\"dest\":" + this.dest + "," + "\"speed\":" + this.getSpeed() + "," + "\"pos\":\""
+				+ this.location.toString() + "\"pos_gui\":\"" + this.getGui_location().toString() + "\"" + "}" + "}";
+		return ans;
 	}
 
 	@Override
@@ -62,6 +64,7 @@ public class Robot implements RobotInterface {
 	@Override
 	public void setId(int id) {
 		this.id = id;
+
 	}
 
 	@Override
@@ -72,26 +75,29 @@ public class Robot implements RobotInterface {
 	@Override
 	public void setValue(double value) {
 		this.value = value;
+
 	}
 
 	@Override
 	public int getSrc() {
-		return this.source;
+		return this.src;
 	}
 
 	@Override
 	public void setSrc(int src) {
-		this.source = src;
+		this.src = src;
+
 	}
 
 	@Override
 	public int getDest() {
-		return this.destination;
+		return this.dest;
 	}
 
 	@Override
 	public void setDest(int dest) {
-		this.destination = dest;
+		this.dest = dest;
+
 	}
 
 	@Override
@@ -102,6 +108,7 @@ public class Robot implements RobotInterface {
 	@Override
 	public void setSpeed(double speed) {
 		this.speed = speed;
+
 	}
 
 	@Override
@@ -112,16 +119,17 @@ public class Robot implements RobotInterface {
 	@Override
 	public void setLocation(Point3D location) {
 		this.location = location;
+
 	}
 
 	@Override
 	public Point3D getGui_location() {
-		return this.gui_location;
+		return this.GuiLocation;
 	}
 
 	@Override
 	public void setGui_location(double x, double y) {
-		this.gui_location = new Point3D(x,y);
+		this.GuiLocation = new Point3D(x,y);
 
 	}
 

@@ -1,9 +1,13 @@
 package gui;
 
+import Server.Game_Server;
+import Server.game_service;
 import algorithms.Graph_Algo;
 import dataStructure.DGraph;
+import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node;
+import dataStructure.node_data;
 import utils.Point3D;
 
 public class Gui_main {
@@ -56,6 +60,18 @@ public class Gui_main {
 
 		Graph_Gui a = new Graph_Gui(g);
 		a.setVisible(true);
+		
+//		game_service game = Game_Server.getServer((0));
+//		graph gra = new DGraph((game.getGraph()));
+//		Graph_Gui a = new Graph_Gui(gra);
+//		a.setVisible(true);
+//		for(node_data n:gra.getV()) {
+//			System.out.println(n.getKey());
+//			for(edge_data e: gra.getE(n.getKey())) {
+//				System.out.println(e.getSrc());
+//				System.out.println(e.getDest());
+//			}
+//		}
 
 	}
 

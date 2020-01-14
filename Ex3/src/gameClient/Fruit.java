@@ -27,7 +27,7 @@ public class Fruit implements FruitInterface {
 		this();
 		try {
 			JSONObject fruit = new JSONObject(str);
-			fruit = fruit.getJSONObject("fruit");
+			fruit = fruit.getJSONObject("Fruit");
 			double v = fruit.getDouble("value");
 			this.value = v;
 			String p = fruit.getString("pos");
