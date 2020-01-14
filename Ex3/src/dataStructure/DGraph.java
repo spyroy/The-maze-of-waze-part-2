@@ -116,29 +116,6 @@ public class DGraph<edgeID> implements graph,Serializable {
 
 	@Override
 	public node_data removeNode(int key) {
-//		node_data n = nodeMap.get(key);
-//		Collection<edge_data> col = (Collection<edge_data>)this.getE(key);
-//		java.util.Iterator<edge_data> it = col.iterator();
-//		while(it.hasNext()) {
-//			edgeMap.remove(it.next());
-//			edgescount--;
-//		}
-//		this.nodeMap.remove(key);
-//		LinkedList<Integer> list = new LinkedList<Integer>();// to-Delete all empty HashMaps.
-//		
-//		// remove all edges going into key-node.
-//		this.edgeMap.forEach((keys, node) -> {
-//			if (node.get(key) != null) {
-//				node.remove(key);
-//				edgescount--;
-//				if (node.isEmpty()) {
-//					list.add(keys);
-//				}
-//			}
-//		});
-//		for (int e : list) {
-//			this.edgeMap.remove(e);
-//		}
 		
 		if (this.nodeMap.get(key) == null) {
 			return null;
@@ -197,7 +174,6 @@ public class DGraph<edgeID> implements graph,Serializable {
 	
 	public void init(String jsonSTR) {
 		try {
-		//	NodeData.resetCount();
 			this.init();
 			this.edgescount = 0;
 			JSONObject graph = new JSONObject(jsonSTR);
@@ -219,8 +195,8 @@ public class DGraph<edgeID> implements graph,Serializable {
 				double w = edges.getJSONObject(i).getDouble("w");
 				this.connect(s, d, w);
 			}
-		} catch (Exception var10) {
-			var10.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
