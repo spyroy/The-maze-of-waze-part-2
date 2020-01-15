@@ -345,8 +345,26 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 			String d = JOptionPane.showInputDialog(this, "enter level 1-24:", "INFORMATION",
 					JOptionPane.INFORMATION_MESSAGE);
 			// MyGameGui mg = new MyGameGui(Integer.parseInt(d + 1));
-			game_service game = Game_Server.getServer(Integer.parseInt(d + 1));
-			graph gar = new DGraph((game.getGraph()));
+			
+			try {
+				this.setVisible(false);
+                Thread t=new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            MyGame game=new MyGame(Integer.parseInt(d));
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+                t.start();
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			game_service game1 = Game_Server.getServer(Integer.parseInt(d));
+//			graph gar = new DGraph((game1.getGraph()));
 			// gr = new Graph_Algo(graph);
 //			MyGameGui a = new MyGameGui();
 //			a.initGui(graph);
@@ -356,7 +374,7 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 //			System.out.println(graph.toString());
 //			Graph_Gui a = new Graph_Gui(graph);
 //			a.setVisible(true);
-			MyGameGui b = new MyGameGui(gar, Integer.parseInt(d));
+//			MyGameGui b = new MyGameGui(gar, Integer.parseInt(d));
 
 		}
 
