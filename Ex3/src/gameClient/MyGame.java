@@ -88,7 +88,8 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			time.setText("Time: " + game.timeToEnd() / 1000);
 			Thread.sleep(125);
 			moveRobots(game, graph);
-			repaint();
+			update(getGraphics());
+			//repaint();
 		}
 		String results = game.toString();
 		JOptionPane.showMessageDialog(this, "Game over: " + results, "INFORMATION", JOptionPane.INFORMATION_MESSAGE);
@@ -205,9 +206,11 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		super.paint(graphics);
 		BufferedImage buffer = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = buffer.createGraphics();
+		g2d.setBackground(new Color(240, 240, 240));
 		super.paint(g2d);
 		Graphics2D g2dComponent = (Graphics2D) graphics;
 		g2dComponent.drawImage(buffer, null, 0, 0);
+		//update(graphics);
 
 		double[] x_toScale = find_min_max_axis();
 		double[] y_toScale = find_min_max_ayis();
