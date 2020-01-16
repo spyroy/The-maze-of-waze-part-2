@@ -1,16 +1,12 @@
 package gameClient;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Array;
 
 import javax.swing.*;
@@ -36,6 +32,7 @@ import dataStructure.edge_data;
 import dataStructure.graph;
 import dataStructure.node;
 import dataStructure.node_data;
+import gameClient.Robot;
 import gui.Graph_Gui;
 //import javafx.scene.text.Font;
 import utils.Point3D;
@@ -48,7 +45,15 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 	private ArrayList<Fruit> fruits;
 	private ArrayList<Robot> robots;
 	private static final FruitComperator comp = new FruitComperator();
-	static int user_Dst = -1;
+	static int Udst = -1;
+	public static final double EPS1 = 0.001, EPS2 = Math.pow(EPS1, 2);
+	private Graph_Algo algoGraph;
+	final int NODE_WIDTH_HEIGHT = 10;
+	private game_service game;
+	final int FRAME_WIDTH = 1000;
+	final int FRAME_HEIGHT = 1000;
+	static int udst = -1;
+	private boolean mode;
 
 	/*
 	 * Default constructor
@@ -194,11 +199,11 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		String dst_str = JOptionPane.showInputDialog(this,
+		String str = JOptionPane.showInputDialog(this,
 				"Please insert node number to move, " + "\n" + "only neighbors nodes are allowed: ");
 		try {
-			int dst = Integer.parseInt(dst_str);
-			user_Dst = dst;
+			int dst = Integer.parseInt(str);
+			Udst = dst;
 		} catch (Exception ee) {
 			JOptionPane.showMessageDialog(this, "Invalid input", "ERROR", JOptionPane.ERROR_MESSAGE);
 		}
@@ -346,166 +351,81 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 					JOptionPane.INFORMATION_MESSAGE);
 			// MyGameGui mg = new MyGameGui(Integer.parseInt(d + 1));
 			
+
 			try {
 				this.setVisible(false);
-                Thread t=new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            MyGame game=new MyGame(Integer.parseInt(d));
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
-                t.start();
+				Thread t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							MyGame game = new MyGame(Integer.parseInt(d) - 1);
+							game.repaint();
+							update(game.getGraphics());
+						} catch (InterruptedException ex) {
+							ex.printStackTrace();
+						}
+					}
+				});
+				t.start();
 			} catch (NumberFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-//			game_service game1 = Game_Server.getServer(Integer.parseInt(d));
-//			graph gar = new DGraph((game1.getGraph()));
-			// gr = new Graph_Algo(graph);
-//			MyGameGui a = new MyGameGui();
-//			a.initGui(graph);
-//			initGui(graph);
-//			a.setVisible(true);
-//			repaint();
-//			System.out.println(graph.toString());
-//			Graph_Gui a = new Graph_Gui(graph);
-//			a.setVisible(true);
-//			MyGameGui b = new MyGameGui(gar, Integer.parseInt(d));
+			break;
+			
+		case "Automatic":
+			String m = JOptionPane.showInputDialog(this, "enter level 1-24:", "INFORMATION",
+					JOptionPane.INFORMATION_MESSAGE);
+			// MyGameGui mg = new MyGameGui(Integer.parseInt(d + 1));
+			
 
-		}
-
-	}
-
-	public MyGameGui(graph b, int scenerio) {
-		graph g = new DGraph();
-		for (node_data n : b.getV()) {
-			Point3D p = n.getLocation();
-			node h = new node(n.getKey(), p, n.getWeight());
-			g.addNode(h);
-		}
-		for (node_data n : b.getV()) {
-			for (edge_data e : b.getE(n.getKey())) {
-				g.connect(e.getSrc(), e.getDest(), e.getWeight());
-			}
-		}
-		Graph_Gui a = new Graph_Gui(g);
-		a.setVisible(true);
-
-	}
-
-	public void paint(Graphics d) {
-		super.paint(d);
-
-		if (graph != null) {
-			// get nodes
-			Collection<node_data> nodes = graph.getV();
-
-			for (node_data n : nodes) {
-				// draw nodes
-				Point3D p = n.getLocation();
-				d.setColor(Color.BLUE);
-				d.drawOval(p.ix(), p.iy(), 20, 20);
-
-				// check if there are edges
-				if (graph.edgeSize() == 0)
-					continue;
-				if ((graph.getE(n.getKey()) != null)) {
-					// get edges
-					Collection<edge_data> edges = graph.getE(n.getKey());
-					for (edge_data e : edges) {
-						// draw edges
-						d.setColor(Color.gray);
-						((Graphics2D) d).setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-						Point3D p2 = graph.getNode(e.getDest()).getLocation();
-						d.drawLine(p.ix() + 5, p.iy() + 5, p2.ix() + 5, p2.iy() + 5);
-						// draw direction
-						d.setColor(Color.MAGENTA);
-						d.fillOval((int) ((p.ix() * 0.2) + (0.8 * p2.ix())) + 2,
-								(int) ((p.iy() * 0.2) + (0.8 * p2.iy())), 9, 9);
-						// draw weight
-						d.setColor(Color.RED);
-						String sss = "" + String.valueOf(e.getWeight());
-						d.drawString(sss, 1 + (int) ((p.ix() * 0.2) + (0.8 * p2.ix())),
-								(int) ((p.iy() * 0.2) + (0.8 * p2.iy())) - 2);
+			try {
+				this.setVisible(false);
+				Thread t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							MyGameAuto gamer = new MyGameAuto(Integer.parseInt(m) - 1);
+							gamer.repaint();
+						} catch (InterruptedException ex) {
+							ex.printStackTrace();
+						}
 					}
-				}
-				// draw nodes-key's
-				d.setColor(Color.RED);
-				d.drawString("" + n.getKey(), p.ix() + 7, p.iy() + 12);
+				});
+				t.start();
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			break;
+
 		}
 
 	}
+	
+	
+	
 
-	private void new_graph() {
-		try {
-			System.out.println(gr.toString());
-			int i = 0;
-			while (!graph.getV().isEmpty()) {
-				if (graph.getNode(i) != null)
-					graph.removeNode(i);
-				i++;
-			}
-			repaint();
-		} catch (Exception e) {
 
-		}
-	}
+//	public MyGameGui(graph b, int scenerio) {
+//		graph g = new DGraph();
+//		for (node_data n : b.getV()) {
+//			Point3D p = n.getLocation();
+//			node h = new node(n.getKey(), p, n.getWeight());
+//			g.addNode(h);
+//		}
+//		for (node_data n : b.getV()) {
+//			for (edge_data e : b.getE(n.getKey())) {
+//				g.connect(e.getSrc(), e.getDest(), e.getWeight());
+//			}
+//		}
+//		Graph_Gui a = new Graph_Gui(g);
+//		a.setVisible(true);
+//
+//	}
 
-	private double scale(double data, double r_min, double r_max, double t_min, double t_max) {
-		double res = ((data - r_min) / (r_max - r_min)) * (t_max - t_min) + t_min;
-		return res;
-	}
 
-	private double[] find_min_max__Xaxis() {
-		double[] x_scale = new double[2];
-		double min = Double.MAX_VALUE;
-		double max = Double.MIN_VALUE;
 
-		for (node_data node : this.graph.getV()) {
-
-			if (node.getLocation().x() < min)
-				min = node.getLocation().x();
-			else {
-				if (node.getLocation().x() > max) {
-					max = node.getLocation().x();
-				}
-			}
-		}
-
-		x_scale[0] = min;
-		x_scale[1] = max;
-
-		return x_scale;
-
-	}
-
-	private double[] find_min_max_Yaxis() {
-		double[] y_scale = new double[2];
-		double min = Double.MAX_VALUE;
-		double max = Double.MIN_VALUE;
-
-		for (node_data node : this.graph.getV()) {
-
-			if (node.getLocation().y() < min)
-				min = node.getLocation().y();
-			else {
-				if (node.getLocation().y() > max) {
-					max = node.getLocation().y();
-				}
-			}
-		}
-
-		y_scale[0] = min;
-		y_scale[1] = max;
-
-		return y_scale;
-
-	}
 
 	public static void main(String[] args) {
 		graph g = new DGraph();

@@ -83,4 +83,9 @@ public class Fruit implements FruitInterface {
 		return this.edge;
 	}
 
+	@Override
+	public void setValue(double val) {
+		this.value = val;
+	}
+
 }

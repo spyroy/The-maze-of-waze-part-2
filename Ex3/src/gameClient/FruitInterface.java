@@ -64,6 +64,13 @@ public interface FruitInterface {
 	public double getValue();
 	
 	/**
+	 * each fruit has a value, aka as points, this function 
+	 * sets how much the fruit is worth.
+	 * @return
+	 */
+	public void setValue(double val);
+	
+	/**
 	 * set the edge the fruit is "sitting" on.
 	 * @param e
 	 */
