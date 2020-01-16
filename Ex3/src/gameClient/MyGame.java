@@ -206,7 +206,6 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		super.paint(graphics);
 		BufferedImage buffer = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = buffer.createGraphics();
-		g2d.setBackground(new Color(240, 240, 240));
 		super.paint(g2d);
 		Graphics2D g2dComponent = (Graphics2D) graphics;
 		g2dComponent.drawImage(buffer, null, 0, 0);
@@ -216,11 +215,14 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		double[] y_toScale = find_min_max_ayis();
 		Graphics2D g = (Graphics2D) graphics;
 		for (node_data node : graph.getV()) {
+			double x_gui = scale(node.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
+			double y_gui = scale(node.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
 			g.setColor(Color.MAGENTA);
-			g.drawOval((int) node.getGuiLocation().x() - 3, ((int) node.getGuiLocation().y()) - 3, 20, 20);
+			g.drawOval((int) x_gui - 3, ((int) y_gui) - 3, 20, 20);
 			String id = node.getKey() + "";
 			g.setFont(new Font("deafult", Font.BOLD, 14));
-			g.drawString(id, node.getGuiLocation().ix() + 7, (node.getGuiLocation().iy()) + 15);
+			g.setColor(Color.BLACK);
+			g.drawString(id, (int)x_gui + 7, ((int) y_gui) + 15);
 		}
 
 		for (Fruit fruit : this.fruits) {
@@ -244,23 +246,28 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		for (node_data node : graph.getV()) {
 			if (graph.getE(node.getKey()) != null) {
 				for (edge_data edge : graph.getE(node.getKey())) {
+					double x_gui = scale(node.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
+					double y_gui = scale(node.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
+					node_data dst = graph.getNode(edge.getDest());
+					double x_guir = scale(dst.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
+					double y_guir = scale(dst.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
 					g.setColor(Color.BLACK);
 					g.setFont(new Font("deafult", Font.BOLD, 14));
 					String weight = edge.getWeight() + "";
-					node_data dst = graph.getNode(edge.getDest());
-					g.drawLine(node.getGuiLocation().ix(), node.getGuiLocation().iy(), dst.getGuiLocation().ix(),
-							dst.getGuiLocation().iy());
-					g.setColor(Color.LIGHT_GRAY);
+					//node_data dst = graph.getNode(edge.getDest());
+					g.drawLine((int)x_gui, (int)y_gui, (int)x_guir,
+							(int)y_guir);
+					g.setColor(Color.GREEN);
 
 					// calculate the direction oval location
-					int mid_x = ((node.getGuiLocation().ix() + dst.getGuiLocation().ix()) / 2);
-					int mid_y = ((node.getGuiLocation().iy() + dst.getGuiLocation().iy()) / 2);
-					int d_x = (((((mid_x + dst.getGuiLocation().ix()) / 2) + dst.getGuiLocation().ix()) / 2)
-							+ dst.getGuiLocation().ix()) / 2;
-					int d_y = (((((mid_y + dst.getGuiLocation().iy()) / 2) + dst.getGuiLocation().iy()) / 2)
-							+ dst.getGuiLocation().iy()) / 2;
+					int mid_x = (((int)x_gui + (int)x_guir) / 2);
+					int mid_y = (((int)y_gui + (int)y_guir) / 2);
+					int d_x = (((((mid_x + (int)x_guir) / 2) + (int)x_guir) / 2)
+							+ (int)x_guir) / 2;
+					int d_y = (((((mid_y + (int)y_guir) / 2) + (int)y_guir) / 2)
+							+ (int)y_guir) / 2;
 
-					g.fillOval(d_x - 3, d_y - 3, NODE_WIDTH_HEIGHT, NODE_WIDTH_HEIGHT);
+					g.fillOval(d_x - 3, d_y - 3, 5, 5);
 				}
 			}
 		}
