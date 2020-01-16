@@ -85,7 +85,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		this.setVisible(true);
 		game.startGame();
 		while (game.isRunning()) {
-			time.setText("Time: " + game.timeToEnd() / 1000);
+			time.setText("The clock is ticking: " + game.timeToEnd() / 1000);
 			Thread.sleep(125);
 			moveRobots(game, graph);
 			update(getGraphics());
@@ -96,8 +96,8 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 	}
 
 	private void turnToGuiLocation(int width, int height) {
-		double[] xScale = find_min_max_axis();
-		double[] yScale = find_min_max_ayis();
+		double[] xScale = find_min_max_Xaxis();
+		double[] yScale = find_min_max_Yaxis();
 		for (node_data node : this.graph.getV()) {
 			double x_gui = scale(node.getLocation().x(), xScale[0], xScale[1], 50, width - 50);
 			double y_gui = scale(node.getLocation().y() , yScale[0], yScale[1], 70, height - 70);
@@ -131,10 +131,14 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	private void moveRobots(game_service game, graph graph) {
 		List<String> path = game.move();
+		List<String> robots = game.getRobots();
+		//System.out.println(game.getRobots());
+		System.out.println(path.toString());
 		if (path != null) {
-			long t = game.timeToEnd();
+			
 			for (int i = 0; i < path.size(); i++) {
 				String robot_json = path.get(i);
+				System.out.println(path.get(i));
 				try {
 					JSONObject line = new JSONObject(robot_json);
 					JSONObject rob = line.getJSONObject("Robot");
@@ -149,6 +153,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 						dest = nextNode(graph, src, dst);
 						game.chooseNextEdge(robid, dest);
 					}
+
 					this.robots.get(robid).setLocation(new Point3D(pos));
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -211,12 +216,13 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		g2dComponent.drawImage(buffer, null, 0, 0);
 		//update(graphics);
 
-		double[] x_toScale = find_min_max_axis();
-		double[] y_toScale = find_min_max_ayis();
+		double[] x_toScale = find_min_max_Xaxis();
+		double[] y_toScale = find_min_max_Yaxis();
 		Graphics2D g = (Graphics2D) graphics;
 		for (node_data node : graph.getV()) {
 			double x_gui = scale(node.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 			double y_gui = scale(node.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
+			y_gui = this.getHeight() - y_gui;
 			g.setColor(Color.MAGENTA);
 			g.drawOval((int) x_gui - 3, ((int) y_gui) - 3, 20, 20);
 			String id = node.getKey() + "";
@@ -233,6 +239,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			}
 			double x_gui = scale(fruit.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 			double y_gui = scale(fruit.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
+			y_gui = this.getHeight() - y_gui;
 			fruit.setLocationOnGui(x_gui, y_gui);
 			Shape circle = new Arc2D.Double(fruit.getLocationOnGui().x() - 10, fruit.getLocationOnGui().y() - 10, 30,
 					30, 0, 360, Arc2D.CHORD);
@@ -248,9 +255,11 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 				for (edge_data edge : graph.getE(node.getKey())) {
 					double x_gui = scale(node.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 					double y_gui = scale(node.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
+					y_gui = this.getHeight() - y_gui;
 					node_data dst = graph.getNode(edge.getDest());
 					double x_guir = scale(dst.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 					double y_guir = scale(dst.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
+					y_guir = this.getHeight() - y_guir;
 					g.setColor(Color.BLACK);
 					g.setFont(new Font("deafult", Font.BOLD, 14));
 					String weight = edge.getWeight() + "";
@@ -276,12 +285,13 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			g.setStroke(new BasicStroke((float) 3.0));
 			double x_gui = scale(robot.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 			double y_gui = scale(robot.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
+			y_gui = this.getHeight() - y_gui;
 			robot.setGui_location(x_gui, y_gui);
 			g.fillOval((int) robot.getGui_location().x() - 7, (int) robot.getGui_location().y() - 7, 25, 25);
 		}
 	}
 
-	private double[] find_min_max_axis() {
+	private double[] find_min_max_Xaxis() {
 		double[] x_scale = new double[2];
 		double min = Double.MAX_VALUE;
 		double max = Double.MIN_VALUE;
@@ -304,7 +314,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	}
 
-	private double[] find_min_max_ayis() {
+	private double[] find_min_max_Yaxis() {
 		double[] y_scale = new double[2];
 		double min = Double.MAX_VALUE;
 		double max = Double.MIN_VALUE;
@@ -371,10 +381,12 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	public static void main(String[] a) throws InterruptedException {
 
-		// game_service game = Game_Server.getServer(2); // you have [0,23]
+		game_service game = Game_Server.getServer(12); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
+		
 		MyGame m = new MyGame(0);
+		
 
 		// System.out.println(m.g);
 	}

@@ -38,13 +38,6 @@ import gui.Graph_Gui;
 import utils.Point3D;
 import utils.StdDraw;
 
-/**
- * This class represents a Graphical User Interface - GUI of the game.
- * MyGameGui attributes:
- * 1. Game .
- * 2. mode- manual /automatic .
- */
-
 public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 
 	private graph graph;
@@ -65,9 +58,7 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 	/*
 	 * Default constructor
 	 */
-	public MyGameGui() 
-	{
-		
+	public MyGameGui() {
 		this.graph = new DGraph();
 		gr = new Graph_Algo();
 		initGui(graph);
