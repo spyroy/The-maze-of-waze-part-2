@@ -387,6 +387,7 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 						try {
 							MyGameAuto gamer = new MyGameAuto(Integer.parseInt(m) - 1);
 							gamer.repaint();
+							update(gamer.getGraphics());
 						} catch (InterruptedException ex) {
 							ex.printStackTrace();
 						}

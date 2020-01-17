@@ -42,7 +42,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 	private Image doubleBuffer;
 
 	public MyGameAuto(int num_scenario) throws InterruptedException {
-		game_service game = Game_Server.getServer(num_scenario);
+		this.game = Game_Server.getServer(num_scenario);
 		graph = new DGraph(game.getGraph());
 		algoGraph = new Graph_Algo(graph);
 		turnToGuiLocation(FRAME_WIDTH, FRAME_HEIGHT);
@@ -91,7 +91,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			Thread.sleep(125);
 			moveRobots(game, graph);
 			update(getGraphics());
-			//repaint();
+			// repaint();
 		}
 		String results = game.toString();
 		JOptionPane.showMessageDialog(this, "Game over: " + results, "INFORMATION", JOptionPane.INFORMATION_MESSAGE);
@@ -102,7 +102,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		double[] yScale = find_min_max_Yaxis();
 		for (node_data node : this.graph.getV()) {
 			double x_gui = scale(node.getLocation().x(), xScale[0], xScale[1], 50, width - 50);
-			double y_gui = scale(node.getLocation().y() , yScale[0], yScale[1], 70, height - 70);
+			double y_gui = scale(node.getLocation().y(), yScale[0], yScale[1], 70, height - 70);
 			node.setGuiLocation(x_gui, y_gui);
 		}
 
@@ -132,42 +132,126 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 	}
 
 	private void moveRobots(game_service game, graph graph) {
-		List<String> log = game.move();
-		if(log!=null) {
-			long t = game.timeToEnd();
-			for(int i=0;i<log.size();i++) {
-				String robot_json = log.get(i);
+//		//MyGameGui my = new MyGameGui();
+//		List<String> log = game.move();
+//		if (log != null) {
+//			long t = this.game.timeToEnd();
+//			for (int i = 0; i < log.size(); i++) {
+//				try {
+//					String robot_json = log.get(i);
+//					JSONObject line = new JSONObject(robot_json);
+//					JSONObject rob = line.getJSONObject("Robot");
+//					int rid = rob.getInt("id");
+//					int src = rob.getInt("src");
+//					int dest = rob.getInt("dest");
+//					if (dest == -1) {
+//						dest = nextNode(graph, src);
+//						game.chooseNextEdge(rid, dest);
+//						System.out.println("Turn to node: " + dest + "  time to end:" + (t / 1000));
+//						System.out.println((new JSONObject(log.get(i))).getJSONObject("Robot"));
+//					}
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//		for (Iterator<node_data> verIter = graph.getV().iterator(); verIter.hasNext();) {
+//			int src = verIter.next().getKey();
+//			try {
+//				for (Iterator<edge_data> edgeIter = graph.getE(src).iterator(); edgeIter.hasNext();) {
+//					edgeIter.next().setTag(0);
+//				}
+//			} catch (NullPointerException e) {
+//			}
+//		}
+//		((Graph_Algo) game).init(game.getGraph());
+
+		List<String> path = game.move();
+		List<String> robots = game.getRobots();
+		// System.out.println(game.getRobots());
+		// System.out.println(path.toString());
+		if (path != null) {
+
+			for (int i = 0; i < path.size(); i++) {
+				String robot_json = path.get(i);
+				System.out.println(path.get(i));
 				try {
 					JSONObject line = new JSONObject(robot_json);
-					JSONObject ttt = line.getJSONObject("Robot");
-					int rid = ttt.getInt("id");
-					int src = ttt.getInt("src");
-					int dest = ttt.getInt("dest");
-				
-					if(dest==-1) {	
+					JSONObject rob = line.getJSONObject("Robot");
+					int robid = rob.getInt("id");
+					int src = rob.getInt("src");
+					int dest = rob.getInt("dest");
+					String pos = rob.getString("pos");
+					int dst = udst;
+
+					if (dest == -1) {
+
 						dest = nextNode(graph, src);
-						game.chooseNextEdge(rid, dest);
-						System.out.println("Turn to node: "+dest+"  time to end:"+(t/1000));
-						System.out.println(ttt);
+						game.chooseNextEdge(robid, dest);
 					}
-				} 
-				catch (JSONException e) {e.printStackTrace();}
+
+					this.robots.get(robid).setLocation(new Point3D(pos));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
 			}
+			fruits.clear();
+			for (String fruit : game.getFruits()) {
+				Fruit fruit_tmp = new Fruit(fruit);
+				placeFruit(fruit_tmp);
+				fruits.add(fruit_tmp);
+			}
+			fruits.sort(comp);
 		}
 	}
 
 	private int nextNode(graph graph, int src) {
-		int ans = -1;
-		Collection<edge_data> ee = graph.getE(src);
-		Iterator<edge_data> itr = ee.iterator();
-		int s = ee.size();
-		int r = (int)(Math.random()*s);
-		int i=0;
-		while(i<r) {itr.next();i++;}
-		ans = itr.next().getDest();
-		return ans;
+		Double min = Double.MAX_VALUE;
+		int dest = 0;
+		int key = 0;
+		boolean isGetDest = false;
+		// List<String> log = game.getFruits();
+		// System.out.println(log.toString());
+		for (int i = 0; i < game.getFruits().size(); i++) {
+//			String robot_json = log.get(i);
+//			JSONObject line = new JSONObject(robot_json);
+//			JSONObject rob = line.getJSONObject("Fruit");
+			fruits.sort(comp);
+			Fruit f = new Fruit(game.getFruits().get(i));
+			placeFruit(f);
+			if (f.getEdge().getTag() == 0 && algoGraph.shortestPathDist(src, f.getEdge().getDest()) < min)
+
+			{
+				key = i;
+				isGetDest = true;
+				min = algoGraph.shortestPathDist(src, f.getEdge().getDest());
+				if (src == f.getEdge().getDest())
+
+				{
+					dest = f.getEdge().getSrc();
+				}
+				dest = f.getEdge().getDest();
+			}
+		}
+		if (!isGetDest) {
+			System.out.println("is get dest");
+			Fruit f = new Fruit(game.getFruits().get(0));
+			placeFruit(f);
+			if (src == f.getEdge().getDest()) {
+				dest = f.getEdge().getSrc();
+			} else
+				dest = f.getEdge().getDest();
+		}
+		Fruit f = new Fruit(game.getFruits().get(key));
+		placeFruit(f);
+		f.getEdge().setTag(1);
+		graph.getEdge(f.getEdge().getDest(), f.getEdge().getSrc()).setTag(1);
+
+		List<node_data> node = algoGraph.shortestPath(src, dest);
+		if(node.size() <= 1)
+			return -1;
+		return node.get(1).getKey();
 	}
-	
 
 	// private void initGui(int width, int height) {
 	//
@@ -205,7 +289,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		super.paint(g2d);
 		Graphics2D g2dComponent = (Graphics2D) graphics;
 		g2dComponent.drawImage(buffer, null, 0, 0);
-		//update(graphics);
+		// update(graphics);
 
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
@@ -219,7 +303,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			String id = node.getKey() + "";
 			g.setFont(new Font("deafult", Font.BOLD, 14));
 			g.setColor(Color.BLACK);
-			g.drawString(id, (int)x_gui + 7, ((int) y_gui) + 15);
+			g.drawString(id, (int) x_gui + 7, ((int) y_gui) + 15);
 		}
 
 		for (Fruit fruit : this.fruits) {
@@ -254,18 +338,15 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 					g.setColor(Color.BLACK);
 					g.setFont(new Font("deafult", Font.BOLD, 14));
 					String weight = edge.getWeight() + "";
-					//node_data dst = graph.getNode(edge.getDest());
-					g.drawLine((int)x_gui, (int)y_gui, (int)x_guir,
-							(int)y_guir);
+					// node_data dst = graph.getNode(edge.getDest());
+					g.drawLine((int) x_gui, (int) y_gui, (int) x_guir, (int) y_guir);
 					g.setColor(Color.GREEN);
 
 					// calculate the direction oval location
-					int mid_x = (((int)x_gui + (int)x_guir) / 2);
-					int mid_y = (((int)y_gui + (int)y_guir) / 2);
-					int d_x = (((((mid_x + (int)x_guir) / 2) + (int)x_guir) / 2)
-							+ (int)x_guir) / 2;
-					int d_y = (((((mid_y + (int)y_guir) / 2) + (int)y_guir) / 2)
-							+ (int)y_guir) / 2;
+					int mid_x = (((int) x_gui + (int) x_guir) / 2);
+					int mid_y = (((int) y_gui + (int) y_guir) / 2);
+					int d_x = (((((mid_x + (int) x_guir) / 2) + (int) x_guir) / 2) + (int) x_guir) / 2;
+					int d_y = (((((mid_y + (int) y_guir) / 2) + (int) y_guir) / 2) + (int) y_guir) / 2;
 
 					g.fillOval(d_x - 3, d_y - 3, 5, 5);
 				}
@@ -368,9 +449,8 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		game_service game = Game_Server.getServer(12); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
-		
-		MyGameAuto m = new MyGameAuto(0);
-		
+
+		MyGameAuto m = new MyGameAuto(15);
 
 		// System.out.println(m.g);
 	}

@@ -133,7 +133,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		List<String> path = game.move();
 		List<String> robots = game.getRobots();
 		//System.out.println(game.getRobots());
-		System.out.println(path.toString());
+		//System.out.println(path.toString());
 		if (path != null) {
 			
 			for (int i = 0; i < path.size(); i++) {
@@ -355,7 +355,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			int dst = Integer.parseInt(dst_str);
 			udst = dst;
 		} catch (Exception ee) {
-			JOptionPane.showMessageDialog(this, "Invalid input", "ERROR", JOptionPane.ERROR_MESSAGE);
+			//JOptionPane.showMessageDialog(this, "Invalid input", "ERROR", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -384,8 +384,10 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		game_service game = Game_Server.getServer(12); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
-		
+		List<String> log = game.getFruits();
+		System.out.println(log.toString());
 		MyGame m = new MyGame(0);
+		
 		
 
 		// System.out.println(m.g);
