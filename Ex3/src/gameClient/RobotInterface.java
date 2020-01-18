@@ -6,7 +6,7 @@ import utils.Point3D;
  * each robot has to be on a node, there can be 1 robot up to 5, the robots need
  * to take the fruits as fast as possible.
  * 
- * @author MatanGreenberg
+ * @authors MatanGreenberg, Or Mendel
  *
  */
 
@@ -39,6 +39,7 @@ public interface RobotInterface {
 	 * 
 	 * @return
 	 */
+
 	public int getId();
 
 	/**

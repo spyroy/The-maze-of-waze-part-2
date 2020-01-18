@@ -46,6 +46,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		turnToGuiLocation(FRAME_WIDTH, FRAME_HEIGHT);
 		for (String f : game.getFruits()) {
 			Fruit ftmp = new Fruit(f);
+//			System.out.println(ftmp.getType());
 			placeFruit(ftmp);
 			fruits.add(ftmp);
 		}
@@ -56,19 +57,23 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			robots = robots.getJSONObject("GameServer");
 			int num_robots = robots.getInt("robots");
 			for (int i = 0; i < num_robots; i++) {
-				if (i < this.fruits.size()) {
+				if (i < this.fruits.size())
+				{
 					int src = this.fruits.get(i).getEdge().getSrc();
 					node_data node_src = this.graph.getNode(src);
 					Point3D src_p = node_src.getLocation();
 					game.addRobot(src);
-				} else {
+				} 
+				else 
 					game.addRobot(i);
-				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
-		for (String robot : game.getRobots()) {
+		for (String robot : game.getRobots())
+		{
 			Robot robot_tmp = new Robot(robot);
 			robots.add(robot_tmp);
 		}
@@ -89,7 +94,6 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			Thread.sleep(125);
 			moveRobots(game, graph);
 			update(getGraphics());
-			//repaint();
 		}
 		String results = game.toString();
 		JOptionPane.showMessageDialog(this, "Game over: " + results, "INFORMATION", JOptionPane.INFORMATION_MESSAGE);
@@ -106,9 +110,12 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	}
 
-	private void placeFruit(Fruit f) {
-		for (node_data n : this.graph.getV()) {
-			for (edge_data e : this.graph.getE(n.getKey())) {
+	private void placeFruit(Fruit f)
+	{
+		for (node_data n : this.graph.getV()) 
+		{
+			for (edge_data e : this.graph.getE(n.getKey())) 
+			{
 				node_data dest = this.graph.getNode(e.getDest());
 				double nd = n.getLocation().distance3D(f.getLocation());
 				double nf = f.getLocation().distance3D(dest.getLocation());
@@ -121,7 +128,8 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 					type = -1; // banana
 				}
 
-				if ((Math.abs(tmp) <= EPS2) && (f.getType() == type)) {
+				if ((Math.abs(tmp) <= EPS2) && (f.getType() == type)) 
+				{
 					f.setEdge(e);
 					return;
 				}
@@ -132,13 +140,13 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 	private void moveRobots(game_service game, graph graph) {
 		List<String> path = game.move();
 		List<String> robots = game.getRobots();
-		//System.out.println(game.getRobots());
-		//System.out.println(path.toString());
+//		System.out.println(game.getRobots());
+//		System.out.println(path.toString());
 		if (path != null) {
 			
 			for (int i = 0; i < path.size(); i++) {
 				String robot_json = path.get(i);
-				System.out.println(path.get(i));
+//				System.out.println(path.get(i));
 				try {
 					JSONObject line = new JSONObject(robot_json);
 					JSONObject rob = line.getJSONObject("Robot");
@@ -162,7 +170,6 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			fruits.clear();
 			for (String fruit : game.getFruits()) {
 				Fruit fruit_tmp = new Fruit(fruit);
-				placeFruit(fruit_tmp);
 				fruits.add(fruit_tmp);
 			}
 			fruits.sort(comp);
@@ -200,25 +207,14 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			paint(g);
 		}
 	}
-
-	public void paint(Graphics graphics) {
-//		 BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
-//         Graphics2D g2dr = bufferedImage.createGraphics();
-//         g2dr.setBackground(new Color(240, 240, 240));
-//         g2dr.clearRect(0, 0, WIDTH, HEIGHT);
-//         Graphics2D g2dComponentr = (Graphics2D) graphics;
-//         g2dComponentr.drawImage(bufferedImage, null, 0, 0);
-		super.paint(graphics);
-		BufferedImage buffer = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = buffer.createGraphics();
-		super.paint(g2d);
-		Graphics2D g2dComponent = (Graphics2D) graphics;
-		g2dComponent.drawImage(buffer, null, 0, 0);
-		//update(graphics);
-
+	public void paintComponents(Graphics g)
+	{
+		super.paintComponents(g);
+	}
+	private void drawNodes(Graphics2D g)
+	{
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
-		Graphics2D g = (Graphics2D) graphics;
 		for (node_data node : graph.getV()) {
 			double x_gui = scale(node.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 			double y_gui = scale(node.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
@@ -226,15 +222,29 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			g.setColor(Color.MAGENTA);
 			g.drawOval((int) x_gui - 3, ((int) y_gui) - 3, 20, 20);
 			String id = node.getKey() + "";
-			g.setFont(new Font("deafult", Font.BOLD, 14));
+			g.setFont(new Font("default", Font.BOLD, 14));
 			g.setColor(Color.BLACK);
 			g.drawString(id, (int)x_gui + 7, ((int) y_gui) + 15);
 		}
-
+	}
+	
+	private void drawFruits(Graphics2D g)
+	{
+		double[] x_toScale = find_min_max_Xaxis();
+		double[] y_toScale = find_min_max_Yaxis();
+		
 		for (Fruit fruit : this.fruits) {
-			if (fruit.getType() == 1) {
+			if (fruit.getType() == 1) 
+			{
+				/**
+				 * Here put icon of an apple
+				 */
 				g.setColor(Color.RED);
-			} else {
+			} else 
+			{
+				/**
+				 * Here put icon of a banana
+				 */
 				g.setColor(Color.YELLOW);
 			}
 			double x_gui = scale(fruit.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
@@ -249,7 +259,12 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			g.setColor(Color.BLUE);
 			g.drawString(id, fruit.getLocationOnGui().ix() + 1, fruit.getLocationOnGui().iy() + 11);
 		}
-
+	}
+	
+	private void drawEdges(Graphics2D g)
+	{
+		double[] x_toScale = find_min_max_Xaxis();
+		double[] y_toScale = find_min_max_Yaxis();
 		for (node_data node : graph.getV()) {
 			if (graph.getE(node.getKey()) != null) {
 				for (edge_data edge : graph.getE(node.getKey())) {
@@ -266,6 +281,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 					//node_data dst = graph.getNode(edge.getDest());
 					g.drawLine((int)x_gui, (int)y_gui, (int)x_guir,
 							(int)y_guir);
+					turnToGuiLocation(1000, 1000);
 					g.setColor(Color.GREEN);
 
 					// calculate the direction oval location
@@ -280,7 +296,13 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 				}
 			}
 		}
-		for (Robot robot : this.robots) {
+	}
+	private void drawRobots(Graphics2D g)
+	{
+		double[] x_toScale = find_min_max_Xaxis();
+		double[] y_toScale = find_min_max_Yaxis();
+		for (Robot robot : this.robots)
+		{
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke((float) 3.0));
 			double x_gui = scale(robot.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
@@ -289,6 +311,31 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			robot.setGui_location(x_gui, y_gui);
 			g.fillOval((int) robot.getGui_location().x() - 7, (int) robot.getGui_location().y() - 7, 25, 25);
 		}
+	}
+	public void paint(Graphics graphics) {
+//		 BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+//         Graphics2D g2dr = bufferedImage.createGraphics();
+//         g2dr.setBackground(new Color(240, 240, 240));
+//         g2dr.clearRect(0, 0, WIDTH, HEIGHT);
+//         Graphics2D g2dComponentr = (Graphics2D) graphics;
+//         g2dComponentr.drawImage(bufferedImage, null, 0, 0);
+		super.paint(graphics);
+		BufferedImage buffer = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2d = buffer.createGraphics();
+		super.paint(g2d);
+		Graphics2D g2dComponent = (Graphics2D) graphics;
+		g2dComponent.drawImage(buffer, null, 0, 0);
+		//update(graphics);
+		Graphics2D g = (Graphics2D) graphics;
+
+		/**
+		 * Functions of drawing...
+		 */
+		drawNodes(g);
+		drawFruits(g);
+		drawEdges(g);
+		drawRobots(g);
+		
 	}
 
 	private double[] find_min_max_Xaxis() {
@@ -381,12 +428,12 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	public static void main(String[] a) throws InterruptedException {
 
-		game_service game = Game_Server.getServer(12); // you have [0,23]
+		game_service game = Game_Server.getServer(20); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
 		List<String> log = game.getFruits();
-		System.out.println(log.toString());
-		MyGame m = new MyGame(0);
+//		JOptionPane.showMessageDialog((Component) log, "NOPE", "Information", JOptionPane.INFORMATION_MESSAGE);
+		MyGame m = new MyGame(10);
 		
 		
 

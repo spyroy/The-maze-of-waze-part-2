@@ -54,7 +54,6 @@ public class SimpleGameClient {
 				game.addRobot(src_node+a);
 			}
 		}
-		
 		catch (JSONException e) {e.printStackTrace();}
 		game.startGame();
 		// should be a Thread!!!

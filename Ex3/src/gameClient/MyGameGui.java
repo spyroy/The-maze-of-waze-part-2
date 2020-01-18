@@ -359,8 +359,6 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 					public void run() {
 						try {
 							MyGame game = new MyGame(Integer.parseInt(d) - 1);
-							game.repaint();
-							update(game.getGraphics());
 						} catch (InterruptedException ex) {
 							ex.printStackTrace();
 						}
@@ -432,8 +430,8 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 		graph g = new DGraph();
 		MyGameGui a = new MyGameGui();
 		a.setVisible(true);
-		game_service gs = Game_Server.getServer(23);
-		System.out.println(gs);
+//		game_service gs = Game_Server.getServer(1);
+//		System.out.println(gs);
 	}
 
 }

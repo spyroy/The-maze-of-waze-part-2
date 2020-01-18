@@ -174,7 +174,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 
 			for (int i = 0; i < path.size(); i++) {
 				String robot_json = path.get(i);
-				System.out.println(path.get(i));
+//				System.out.println(path.get(i));
 				try {
 					JSONObject line = new JSONObject(robot_json);
 					JSONObject rob = line.getJSONObject("Robot");
@@ -234,7 +234,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			}
 		}
 		if (!isGetDest) {
-			System.out.println("is get dest");
+//			System.out.println("is get dest");
 			Fruit f = new Fruit(game.getFruits().get(0));
 			placeFruit(f);
 			if (src == f.getEdge().getDest()) {
