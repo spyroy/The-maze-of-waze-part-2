@@ -43,7 +43,7 @@ public class KML_Logger
 						" <Style id=\"node\">\r\n" +
 						"      <IconStyle>\r\n" +
 						"        <Icon>\r\n" +
-						"          <href>http://maps.google.com/mapfiles/kml/pal3/icon35.png</href>\r\n" +
+						"          <href>http://maps.google.com/mapfiles/kml/pal3/A.png</href>\r\n" +
 						"        </Icon>\r\n" +
 						"        <hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/>\r\n" +
 						"      </IconStyle>\r\n" +
@@ -51,7 +51,7 @@ public class KML_Logger
 						" <Style id=\"fruit-banana\">\r\n" +
 						"      <IconStyle>\r\n" +
 						"        <Icon>\r\n" +
-						"          <href>http://maps.google.com/mapfiles/kml/pal5/icon49.png</href>\r\n" +
+						"          <href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png</href>\r\n" +
 						"        </Icon>\r\n" +
 						"        <hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/>\r\n" +
 						"      </IconStyle>\r\n" +
@@ -59,7 +59,7 @@ public class KML_Logger
 						" <Style id=\"fruit-apple\">\r\n" +
 						"      <IconStyle>\r\n" +
 						"        <Icon>\r\n" +
-						"          <href>http://maps.google.com/mapfiles/kml/pal5/icon56.png</href>\r\n" +
+						"          <href>http://maps.google.com/mapfiles/kml/paddle/red-stars.png</href>\r\n" +
 						"        </Icon>\r\n" +
 						"        <hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/>\r\n" +
 						"      </IconStyle>\r\n" +
@@ -67,7 +67,7 @@ public class KML_Logger
 						" <Style id=\"robot\">\r\n" +
 						"      <IconStyle>\r\n" +
 						"        <Icon>\r\n" +
-						"          <href>http://maps.google.com/mapfiles/kml/pal4/icon26.png></href>\r\n" +
+						"          <href>http://maps.google.com/mapfiles/kml/shapes/man.png</href>\r\n" +
 						"        </Icon>\r\n" +
 						"        <hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/>\r\n" +
 						"      </IconStyle>\r\n" +
@@ -84,11 +84,13 @@ public class KML_Logger
 	public void addPlaceMark(String id, String location)
 	{
 		//Create formatter
-		DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		//Local date time instance
 		LocalDateTime localDateTime = LocalDateTime.now();
 		//Get formatted String
 		String ldtString = FORMATTER.format(localDateTime);
+		
+		System.out.println(ldtString);
 
 		info.append(
 				"    <Placemark>\r\n" +

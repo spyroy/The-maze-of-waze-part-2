@@ -28,25 +28,22 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 	public static final double EPS1 = 0.001, EPS2 = Math.pow(EPS1, 2);
 	private static final FruitComperator comp = new FruitComperator();
 	private graph graph;
-	private Graph_Algo algoGraph;
 	private ArrayList<Fruit> fruits = new ArrayList<Fruit>();
 	private ArrayList<Robot> robots = new ArrayList<Robot>();
 	final int NODE_WIDTH_HEIGHT = 10;
-	private game_service game;
 	final int FRAME_WIDTH = 1000;
 	final int FRAME_HEIGHT = 1000;
 	static int udst = -1;
-	private boolean mode;
 	private Image doubleBuffer;
+	public static KML_Logger km=null;
 
 	public MyGame(int num_scenario) throws InterruptedException {
 		game_service game = Game_Server.getServer(num_scenario);
 		graph = new DGraph(game.getGraph());
-		algoGraph = new Graph_Algo(graph);
+		km=new KML_Logger(num_scenario);
 		turnToGuiLocation(FRAME_WIDTH, FRAME_HEIGHT);
 		for (String f : game.getFruits()) {
 			Fruit ftmp = new Fruit(f);
-//			System.out.println(ftmp.getType());
 			placeFruit(ftmp);
 			fruits.add(ftmp);
 		}
@@ -57,23 +54,18 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			robots = robots.getJSONObject("GameServer");
 			int num_robots = robots.getInt("robots");
 			for (int i = 0; i < num_robots; i++) {
-				if (i < this.fruits.size())
-				{
+				if (i < this.fruits.size()) {
 					int src = this.fruits.get(i).getEdge().getSrc();
 					node_data node_src = this.graph.getNode(src);
 					Point3D src_p = node_src.getLocation();
 					game.addRobot(src);
-				} 
-				else 
+				} else
 					game.addRobot(i);
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		for (String robot : game.getRobots())
-		{
+		for (String robot : game.getRobots()) {
 			Robot robot_tmp = new Robot(robot);
 			robots.add(robot_tmp);
 		}
@@ -91,10 +83,11 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		game.startGame();
 		while (game.isRunning()) {
 			time.setText("The clock is ticking: " + game.timeToEnd() / 1000);
-			Thread.sleep(125);
+			Thread.sleep(50);
 			moveRobots(game, graph);
 			update(getGraphics());
 		}
+		km.kmlEnd();
 		String results = game.toString();
 		JOptionPane.showMessageDialog(this, "Game over: " + results, "INFORMATION", JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -104,18 +97,15 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		double[] yScale = find_min_max_Yaxis();
 		for (node_data node : this.graph.getV()) {
 			double x_gui = scale(node.getLocation().x(), xScale[0], xScale[1], 50, width - 50);
-			double y_gui = scale(node.getLocation().y() , yScale[0], yScale[1], 70, height - 70);
+			double y_gui = scale(node.getLocation().y(), yScale[0], yScale[1], 70, height - 70);
 			node.setGuiLocation(x_gui, y_gui);
 		}
 
 	}
 
-	private void placeFruit(Fruit f)
-	{
-		for (node_data n : this.graph.getV()) 
-		{
-			for (edge_data e : this.graph.getE(n.getKey())) 
-			{
+	private void placeFruit(Fruit f) {
+		for (node_data n : this.graph.getV()) {
+			for (edge_data e : this.graph.getE(n.getKey())) {
 				node_data dest = this.graph.getNode(e.getDest());
 				double nd = n.getLocation().distance3D(f.getLocation());
 				double nf = f.getLocation().distance3D(dest.getLocation());
@@ -128,8 +118,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 					type = -1; // banana
 				}
 
-				if ((Math.abs(tmp) <= EPS2) && (f.getType() == type)) 
-				{
+				if ((Math.abs(tmp) <= EPS2) && (f.getType() == type)) {
 					f.setEdge(e);
 					return;
 				}
@@ -140,13 +129,11 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 	private void moveRobots(game_service game, graph graph) {
 		List<String> path = game.move();
 		List<String> robots = game.getRobots();
-//		System.out.println(game.getRobots());
-//		System.out.println(path.toString());
+		int current = -1;
 		if (path != null) {
-			
+
 			for (int i = 0; i < path.size(); i++) {
 				String robot_json = path.get(i);
-//				System.out.println(path.get(i));
 				try {
 					JSONObject line = new JSONObject(robot_json);
 					JSONObject rob = line.getJSONObject("Robot");
@@ -156,13 +143,21 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 					String pos = rob.getString("pos");
 					int dst = udst;
 
-					if (dest == -1) {
+					// has some bugs
+					if (current != -1 && (this.robots.get(robid).getLocation()
+							.close2equals(this.robots.get(current).getLocation())) && dest == -1) {
+						dest = nextNodeR(graph, src);
+						game.chooseNextEdge(robid, src + 1);
+						udst = dest;
+					}
 
+					else if (dest == -1) {
+						current = robid;
 						dest = nextNode(graph, src, dst);
 						game.chooseNextEdge(robid, dest);
 					}
-
 					this.robots.get(robid).setLocation(new Point3D(pos));
+					km.addPlaceMark("robot", pos);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -185,9 +180,20 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		return -1;
 	}
 
-	// private void initGui(int width, int height) {
-	//
-	// }
+	private static int nextNodeR(graph g, int src) {
+		int ans = -1;
+		Collection<edge_data> ee = g.getE(src);
+		Iterator<edge_data> itr = ee.iterator();
+		int s = ee.size();
+		int r = (int) (Math.random() * s);
+		int i = 0;
+		while (i < r) {
+			itr.next();
+			i++;
+		}
+		ans = itr.next().getDest();
+		return ans;
+	}
 
 	public void update(Graphics g) {
 		Dimension size = getSize();
@@ -207,12 +213,12 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			paint(g);
 		}
 	}
-	public void paintComponents(Graphics g)
-	{
+
+	public void paintComponents(Graphics g) {
 		super.paintComponents(g);
 	}
-	private void drawNodes(Graphics2D g)
-	{
+
+	private void drawNodes(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
 		for (node_data node : graph.getV()) {
@@ -224,27 +230,26 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			String id = node.getKey() + "";
 			g.setFont(new Font("default", Font.BOLD, 14));
 			g.setColor(Color.BLACK);
-			g.drawString(id, (int)x_gui + 7, ((int) y_gui) + 15);
+			g.drawString(id, (int) x_gui + 7, ((int) y_gui) + 15);
 		}
 	}
-	
-	private void drawFruits(Graphics2D g)
-	{
+
+	private void drawFruits(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
-		
+
 		for (Fruit fruit : this.fruits) {
-			if (fruit.getType() == 1) 
-			{
+			if (fruit.getType() == 1) {
 				/**
 				 * Here put icon of an apple
 				 */
+				km.addPlaceMark("fruit-apple", fruit.getLocation().toString());
 				g.setColor(Color.RED);
-			} else 
-			{
+			} else {
 				/**
 				 * Here put icon of a banana
 				 */
+				km.addPlaceMark("fruit-banana", fruit.getLocation().toString());
 				g.setColor(Color.YELLOW);
 			}
 			double x_gui = scale(fruit.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
@@ -260,9 +265,8 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			g.drawString(id, fruit.getLocationOnGui().ix() + 1, fruit.getLocationOnGui().iy() + 11);
 		}
 	}
-	
-	private void drawEdges(Graphics2D g)
-	{
+
+	private void drawEdges(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
 		for (node_data node : graph.getV()) {
@@ -278,31 +282,27 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 					g.setColor(Color.BLACK);
 					g.setFont(new Font("deafult", Font.BOLD, 14));
 					String weight = edge.getWeight() + "";
-					//node_data dst = graph.getNode(edge.getDest());
-					g.drawLine((int)x_gui, (int)y_gui, (int)x_guir,
-							(int)y_guir);
+					// node_data dst = graph.getNode(edge.getDest());
+					g.drawLine((int) x_gui, (int) y_gui, (int) x_guir, (int) y_guir);
 					turnToGuiLocation(1000, 1000);
 					g.setColor(Color.GREEN);
 
 					// calculate the direction oval location
-					int mid_x = (((int)x_gui + (int)x_guir) / 2);
-					int mid_y = (((int)y_gui + (int)y_guir) / 2);
-					int d_x = (((((mid_x + (int)x_guir) / 2) + (int)x_guir) / 2)
-							+ (int)x_guir) / 2;
-					int d_y = (((((mid_y + (int)y_guir) / 2) + (int)y_guir) / 2)
-							+ (int)y_guir) / 2;
+					int mid_x = (((int) x_gui + (int) x_guir) / 2);
+					int mid_y = (((int) y_gui + (int) y_guir) / 2);
+					int d_x = (((((mid_x + (int) x_guir) / 2) + (int) x_guir) / 2) + (int) x_guir) / 2;
+					int d_y = (((((mid_y + (int) y_guir) / 2) + (int) y_guir) / 2) + (int) y_guir) / 2;
 
 					g.fillOval(d_x - 3, d_y - 3, 5, 5);
 				}
 			}
 		}
 	}
-	private void drawRobots(Graphics2D g)
-	{
+
+	private void drawRobots(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
-		for (Robot robot : this.robots)
-		{
+		for (Robot robot : this.robots) {
 			g.setColor(Color.BLACK);
 			g.setStroke(new BasicStroke((float) 3.0));
 			double x_gui = scale(robot.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
@@ -312,20 +312,14 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			g.fillOval((int) robot.getGui_location().x() - 7, (int) robot.getGui_location().y() - 7, 25, 25);
 		}
 	}
+
 	public void paint(Graphics graphics) {
-//		 BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
-//         Graphics2D g2dr = bufferedImage.createGraphics();
-//         g2dr.setBackground(new Color(240, 240, 240));
-//         g2dr.clearRect(0, 0, WIDTH, HEIGHT);
-//         Graphics2D g2dComponentr = (Graphics2D) graphics;
-//         g2dComponentr.drawImage(bufferedImage, null, 0, 0);
 		super.paint(graphics);
 		BufferedImage buffer = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = buffer.createGraphics();
 		super.paint(g2d);
 		Graphics2D g2dComponent = (Graphics2D) graphics;
 		g2dComponent.drawImage(buffer, null, 0, 0);
-		//update(graphics);
 		Graphics2D g = (Graphics2D) graphics;
 
 		/**
@@ -335,7 +329,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		drawFruits(g);
 		drawEdges(g);
 		drawRobots(g);
-		
+
 	}
 
 	private double[] find_min_max_Xaxis() {
@@ -402,7 +396,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			int dst = Integer.parseInt(dst_str);
 			udst = dst;
 		} catch (Exception ee) {
-			//JOptionPane.showMessageDialog(this, "Invalid input", "ERROR", JOptionPane.ERROR_MESSAGE);
+			// nothing happens
 		}
 	}
 
@@ -433,9 +427,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		// System.out.println(game.getGraph());
 		List<String> log = game.getFruits();
 //		JOptionPane.showMessageDialog((Component) log, "NOPE", "Information", JOptionPane.INFORMATION_MESSAGE);
-		MyGame m = new MyGame(10);
-		
-		
+		MyGame m = new MyGame(11);
 
 		// System.out.println(m.g);
 	}
