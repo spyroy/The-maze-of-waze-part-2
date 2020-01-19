@@ -32,6 +32,13 @@ public class Fruit implements FruitInterface {
 	public Fruit() {
 	}
 	
+	public Fruit (Fruit f) {
+		this.type = f.type;
+		this.value = f.value;
+		this.edge = f.edge;
+		this.position = f.position;
+		this.guiPostion = f.guiPostion;
+	}
 	/**
      * Constructor init fruit attributes from a json string input.
      *

@@ -88,7 +88,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		game.startGame();
 		while (game.isRunning()) {
 			time.setText("The clock is ticking: " + game.timeToEnd() / 1000);
-			Thread.sleep(125);
+			Thread.sleep(50);
 			moveRobots(game, graph);
 			update(getGraphics());
 			// repaint();
@@ -170,6 +170,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		List<String> robots = game.getRobots();
 		// System.out.println(game.getRobots());
 		// System.out.println(path.toString());
+		//System.out.println(game.move());
 		if (path != null) {
 
 			for (int i = 0; i < path.size(); i++) {
@@ -183,11 +184,22 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 					int dest = rob.getInt("dest");
 					String pos = rob.getString("pos");
 					int dst = udst;
+					int current = src;
 
 					if (dest == -1) {
 
 						dest = nextNode(graph, src);
+						//current = dest;
+						
+//						if(dest == -1) {
+//							current = src;
+//							double r = Math.random();
+//							if(r<0.5)
+//								game.chooseNextEdge(robid, src+1);
+//							game.chooseNextEdge(robid, src-1);
+//						}
 						game.chooseNextEdge(robid, dest);
+						//System.out.println(dest);
 					}
 
 					this.robots.get(robid).setLocation(new Point3D(pos));
@@ -206,6 +218,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 	}
 
 	private int nextNode(graph graph, int src) {
+		synchronized (algoGraph) {		
 		Double min = Double.MAX_VALUE;
 		int dest = 0;
 		int key = 0;
@@ -216,41 +229,81 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 //			String robot_json = log.get(i);
 //			JSONObject line = new JSONObject(robot_json);
 //			JSONObject rob = line.getJSONObject("Fruit");
-			fruits.sort(comp);
-			Fruit f = new Fruit(game.getFruits().get(i));
+			fruits.sort(comp.reversed());
+			Fruit f = new Fruit(fruits.get(game.getFruits().size()-i-1));
 			placeFruit(f);
-			if (f.getEdge().getTag() == 0 && algoGraph.shortestPathDist(src, f.getEdge().getDest()) < min)
-
+			if (f.getEdge().getTag() == 0  && algoGraph.shortestPathDist(src, f.getEdge().getSrc()) < min)
 			{
 				key = i;
 				isGetDest = true;
 				min = algoGraph.shortestPathDist(src, f.getEdge().getDest());
-				if (src == f.getEdge().getDest())
-
+				if (src == f.getEdge().getSrc())
 				{
-					dest = f.getEdge().getSrc();
+					dest = f.getEdge().getDest();
 				}
-				dest = f.getEdge().getDest();
+				else
+					dest = f.getEdge().getSrc();
 			}
 		}
+		if(min == -1)
+			return -1;
 		if (!isGetDest) {
 //			System.out.println("is get dest");
-			Fruit f = new Fruit(game.getFruits().get(0));
+			fruits.sort(comp.reversed());
+			Fruit f = new Fruit(fruits.get(0));
 			placeFruit(f);
-			if (src == f.getEdge().getDest()) {
-				dest = f.getEdge().getSrc();
-			} else
+			if (src == f.getEdge().getSrc()) {
 				dest = f.getEdge().getDest();
+			} else
+				dest = f.getEdge().getSrc();
 		}
-		Fruit f = new Fruit(game.getFruits().get(key));
+		
+		fruits.sort(comp.reversed());
+		Fruit f = new Fruit(fruits.get(key));
 		placeFruit(f);
+//		if (src == f.getEdge().getSrc()) {
+//			dest = f.getEdge().getDest();
+//		} else
+//			dest = f.getEdge().getSrc();
 		f.getEdge().setTag(1);
 		graph.getEdge(f.getEdge().getDest(), f.getEdge().getSrc()).setTag(1);
 
 		List<node_data> node = algoGraph.shortestPath(src, dest);
-		if(node.size() <= 1)
+		List<node_data> check = algoGraph.shortestPath(8,3);
+		for(node_data n:node) {
+			System.out.println(n.getKey());
+		}
+		Collection<edge_data> c = graph.getE(src);
+		boolean b = false;
+		if(node.size() <= 1 )
 			return -1;
+		if(src == node.get(1).getKey()) {
+			if(f.getType() == -1) {
+				return src+1;
+			}
+			return src-1;
+		}
+		int i = 0;
+//		for(edge_data e : c) {
+//			if(f.getType() == -1) {
+//				if(e.getDest() < src)
+//					return e.getDest();
+//			}
+//			if(e.getDest() > src)
+//				return e.getDest();
+						
+//				b = true;
+//				break;
+//			}
+//		}
+//		if(b == false) {
+//			return -1;
+//		}
 		return node.get(1).getKey();
+		}
+		
+		
+		
 	}
 
 	// private void initGui(int width, int height) {
@@ -266,6 +319,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		if (doubleBuffer != null) {
 			// paint to double buffer
 			Graphics g2 = doubleBuffer.getGraphics();
+			//g2.setColor(getBackground());
 			paint(g2);
 			g2.dispose();
 			// copy double buffer to screen
@@ -408,6 +462,8 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		return y_scale;
 
 	}
+	
+	
 
 	private double scale(double data, double r_min, double r_max, double t_min, double t_max) {
 		double res = ((data - r_min) / (r_max - r_min)) * (t_max - t_min) + t_min;
@@ -421,6 +477,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		game.stopGame();
 
 	}
 
@@ -450,7 +507,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		// games
 		// System.out.println(game.getGraph());
 
-		MyGameAuto m = new MyGameAuto(15);
+		MyGameAuto m = new MyGameAuto(23);
 
 		// System.out.println(m.g);
 	}

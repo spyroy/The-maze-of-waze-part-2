@@ -180,6 +180,7 @@ public class Graph_Algo implements graph_algorithms {
 	@Override
 	public List<node_data> shortestPath(int src, int dest) {
 		ArrayList<node_data> ans = new ArrayList<node_data>();
+		ArrayList<node_data> ans2 = new ArrayList<node_data>();
 		if (shortestPathDist(src, dest) == -1) {
 			return null;// Empty ArrayList
 		}
@@ -191,9 +192,13 @@ public class Graph_Algo implements graph_algorithms {
 			ans.add(g.getNode(n));
 			des = n;
 		}
-		ans.add(g.getNode(dest));
-		ans.sort(new node_Comperator());
-		return ans;
+		
+		for(int i = ans.size()-1; i >= 0; i--) {
+			ans2.add(ans.get(i));
+		}
+		ans2.add(g.getNode(dest));
+		//ans.sort(new node_Comperator());
+		return ans2;
 	}
 
 	@Override
