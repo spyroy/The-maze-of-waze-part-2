@@ -43,7 +43,8 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 	private Image doubleBuffer;
 	public static KML_Logger km=null;
 
-	public MyGameAuto(int num_scenario) throws InterruptedException {
+	public MyGameAuto(int num_scenario,int id) throws InterruptedException {
+		Game_Server.login(id);
 		this.game = Game_Server.getServer(num_scenario);
 		graph = new DGraph(game.getGraph());
 		algoGraph = new Graph_Algo(graph);
@@ -185,7 +186,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			int dest = 0;
 			int key = 0;
 			boolean isGetDest = false;
-			fruits.sort(comp.reversed());
+			//fruits.sort(comp.reversed());
 			Fruit f = new Fruit();
 			//placeFruit(f);
 			for (int i = 0; i < game.getFruits().size(); i++) {
@@ -478,10 +479,10 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 
 	public static void main(String[] a) throws InterruptedException {
 
-		game_service game = Game_Server.getServer(12); // you have [0,23]
+		game_service game = Game_Server.getServer(24); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
-		MyGameAuto m = new MyGameAuto(0);
+		MyGameAuto m = new MyGameAuto(16,999);
 
 
 		// System.out.println(m.g);

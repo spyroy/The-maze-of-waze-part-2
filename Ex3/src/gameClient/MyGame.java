@@ -37,7 +37,8 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 	private Image doubleBuffer;
 	public static KML_Logger km=null;
 
-	public MyGame(int num_scenario) throws InterruptedException {
+	public MyGame(int num_scenario, int id) throws InterruptedException {
+		Game_Server.login(id);
 		game_service game = Game_Server.getServer(num_scenario);
 		graph = new DGraph(game.getGraph());
 		km=new KML_Logger(num_scenario);
@@ -433,7 +434,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		// System.out.println(game.getGraph());
 		List<String> log = game.getFruits();
 //		JOptionPane.showMessageDialog((Component) log, "NOPE", "Information", JOptionPane.INFORMATION_MESSAGE);
-		MyGame m = new MyGame(11);
+		MyGame m = new MyGame(11,9999);
 
 		// System.out.println(m.g);
 	}

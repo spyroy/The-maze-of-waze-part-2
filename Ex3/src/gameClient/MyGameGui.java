@@ -347,18 +347,17 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 					"INFORMATION", JOptionPane.INFORMATION_MESSAGE);
 			break;
 		case "Manual":
+			String id=JOptionPane.showInputDialog(this,"Enter your id:","INFORMATION",JOptionPane.INFORMATION_MESSAGE);
 			String d = JOptionPane.showInputDialog(this, "enter level 1-24:", "INFORMATION",
 					JOptionPane.INFORMATION_MESSAGE);
 			// MyGameGui mg = new MyGameGui(Integer.parseInt(d + 1));
-			
-
 			try {
 				this.setVisible(false);
 				Thread t = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						try {
-							MyGame game = new MyGame(Integer.parseInt(d) - 1);
+							MyGame game = new MyGame(Integer.parseInt(d) - 1,Integer.parseInt(id));
 						} catch (InterruptedException ex) {
 							ex.printStackTrace();
 						}
@@ -372,6 +371,7 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 			break;
 			
 		case "Automatic":
+			String id2=JOptionPane.showInputDialog(this,"Enter your id:","INFORMATION",JOptionPane.INFORMATION_MESSAGE);
 			String m = JOptionPane.showInputDialog(this, "enter level 1-24:", "INFORMATION",
 					JOptionPane.INFORMATION_MESSAGE);
 			// MyGameGui mg = new MyGameGui(Integer.parseInt(d + 1));
@@ -383,9 +383,9 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 					@Override
 					public void run() {
 						try {
-							MyGameAuto gamer = new MyGameAuto(Integer.parseInt(m) - 1);
+							MyGameAuto gamer = new MyGameAuto(Integer.parseInt(m) - 1,Integer.parseInt(id2));
 							gamer.repaint();
-							update(gamer.getGraphics());
+							gamer.update(gamer.getGraphics());
 						} catch (InterruptedException ex) {
 							ex.printStackTrace();
 						}
