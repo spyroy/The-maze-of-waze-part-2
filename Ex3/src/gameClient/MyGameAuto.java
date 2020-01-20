@@ -154,8 +154,8 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 							&& dest == -1) {
 
 						dest = nextNodeR(graph, src);
-						game.chooseNextEdge(robid, src + 1);
-						src = src + 1;
+						game.chooseNextEdge(robid, dest);
+						//src = src + 1;
 					} else if (dest == -1) {
 						current = robid;
 						dest = nextNode(graph, src);
@@ -185,9 +185,11 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			int dest = 0;
 			int key = 0;
 			boolean isGetDest = false;
+			fruits.sort(comp.reversed());
+			Fruit f = new Fruit();
+			//placeFruit(f);
 			for (int i = 0; i < game.getFruits().size(); i++) {
-				fruits.sort(comp.reversed());
-				Fruit f = new Fruit(fruits.get(game.getFruits().size() - i - 1));
+				f = fruits.get(game.getFruits().size() - i - 1);
 				placeFruit(f);
 				if (f.getEdge().getTag() == 0 && algoGraph.shortestPathDist(src, f.getEdge().getSrc()) < min) {
 					key = i;
@@ -195,25 +197,27 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 					min = algoGraph.shortestPathDist(src, f.getEdge().getDest());
 					if (src == f.getEdge().getSrc()) {
 						dest = f.getEdge().getDest();
-					} else
+					} else {
 						dest = f.getEdge().getSrc();
+					}
+					
 				}
 			}
 			if (min == -1)
 				return -1;
 			if (!isGetDest) {
-				fruits.sort(comp.reversed());
-				Fruit f = new Fruit(fruits.get(0));
+				//fruits.sort(comp.reversed());
+				//f = new Fruit(fruits.get(0));
 				placeFruit(f);
 				if (src == f.getEdge().getSrc()) {
 					dest = f.getEdge().getDest();
 				} else
 					dest = f.getEdge().getSrc();
 			}
-			fruits.sort(comp.reversed());
-			Fruit f = new Fruit(fruits.get(key));
-			placeFruit(f);
-			f.getEdge().setTag(1);
+			//fruits.sort(comp.reversed());
+//			f = new Fruit(fruits.get(key));
+//			placeFruit(f);
+			//f.getEdge().setTag(1);
 			graph.getEdge(f.getEdge().getDest(), f.getEdge().getSrc()).setTag(1);
 			List<node_data> node = algoGraph.shortestPath(src, dest);
 			Collection<edge_data> c = graph.getE(src);
@@ -471,7 +475,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		game_service game = Game_Server.getServer(12); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
-		MyGameAuto m = new MyGameAuto(5);
+		MyGameAuto m = new MyGameAuto(9);
 
 
 		// System.out.println(m.g);
