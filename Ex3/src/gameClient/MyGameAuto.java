@@ -276,6 +276,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 	private void drawNodes(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
+		ArrayList<String> locations = new ArrayList<String>(); 
 		for (node_data node : graph.getV()) {
 			double x_gui = scale(node.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 			double y_gui = scale(node.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
@@ -286,7 +287,12 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			g.setFont(new Font("default", Font.BOLD, 14));
 			g.setColor(Color.BLACK);
 			g.drawString(id, (int) x_gui + 7, ((int) y_gui) + 15);
+			if(node.getLocation().toString() != null) {
+				km.addPlaceMark("node", node.getLocation().toString());
+				locations.add(node.getLocation().toString());
+			}
 		}
+		km.addLineString(locations);
 	}
 
 	private void drawFruits(Graphics2D g) {
@@ -475,7 +481,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		game_service game = Game_Server.getServer(12); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
-		MyGameAuto m = new MyGameAuto(9);
+		MyGameAuto m = new MyGameAuto(0);
 
 
 		// System.out.println(m.g);

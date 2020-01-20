@@ -5,14 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
+import java.util.ArrayList;
 
 public class KML_Logger {
 
 	private int stage;
 	private StringBuilder info;
+	private int index = 0;
 
-	
 	public KML_Logger(int stage) {
 		this.stage = stage;
 		info = new StringBuilder();
@@ -29,8 +29,8 @@ public class KML_Logger {
 				+ "<kml xmlns=\"http://earth.google.com/kml/2.2\">\r\n" + "  <Document>\r\n" + "    <name>"
 				+ "Game stage :" + this.stage + "</name>" + "\r\n" + " <Style id=\"node\">\r\n"
 				+ "      <IconStyle>\r\n" + "        <Icon>\r\n"
-				+ "          <href>http://maps.google.com/mapfiles/kml/pal3/A.png</href>\r\n" + "        </Icon>\r\n"
-				+ "        <hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/>\r\n"
+				+ "          <href>http://maps.google.com/mapfiles/kml/paddle/purple-circle.png</href>\r\n"
+				+ "        </Icon>\r\n" + "        <hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/>\r\n"
 				+ "      </IconStyle>\r\n" + "    </Style>" + " <Style id=\"fruit-banana\">\r\n"
 				+ "      <IconStyle>\r\n" + "        <Icon>\r\n"
 				+ "          <href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png</href>\r\n"
@@ -50,15 +50,27 @@ public class KML_Logger {
 		DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		LocalDateTime localDateTime = LocalDateTime.now();
 		String date = FORMATTER.format(localDateTime);
+		if (id != null && location != null)
+			info.append("    <Placemark>\r\n" + "      <TimeStamp>\r\n" + "        <when>" + date + "</when>\r\n"
+					+ "      </TimeStamp>\r\n" + "      <styleUrl>#" + id + "</styleUrl>\r\n" + "      <Point>\r\n"
+					+ "        <coordinates>" + location + "</coordinates>\r\n" + "      </Point>\r\n"
+					+ "    </Placemark>\r\n");
 
-		info.append("    <Placemark>\r\n" + "      <TimeStamp>\r\n" + "        <when>" + date + "</when>\r\n"
-				+ "      </TimeStamp>\r\n" + "      <styleUrl>#" + id + "</styleUrl>\r\n" + "      <Point>\r\n"
-				+ "        <coordinates>" + location + "</coordinates>\r\n" + "      </Point>\r\n"
-				+ "    </Placemark>\r\n");
+	}
+
+	public void addLineString(ArrayList<String> locations) {
+		if (locations != null)
+
+			info.append("    <LineString>\r\n" + "<tessellate>" + index + "</tessellate>\r\n" + "<coordinates>\r\n");
+		for (String s : locations) {
+			info.append(s + " ");
+		}
+		info.append("</coordinates>\r\n" + "</LineString>");
 
 	}
 
 	
+
 	public void kmlEnd() {
 		info.append("  \r\n</Document>\r\n" + "</kml>");
 		try {
