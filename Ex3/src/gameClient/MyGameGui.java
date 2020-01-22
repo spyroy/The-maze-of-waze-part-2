@@ -408,6 +408,8 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 				e.printStackTrace();
 			}
 			break;
+		case "personal data":
+			break;
 
 		}
 
