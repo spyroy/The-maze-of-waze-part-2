@@ -83,5 +83,9 @@ public class KML_Logger {
 			e.printStackTrace();
 		}
 	}
+	
+	public String kmlToString() {
+		return info.toString();
+	}
 
 }

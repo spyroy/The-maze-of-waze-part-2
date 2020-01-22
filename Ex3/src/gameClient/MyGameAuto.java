@@ -41,14 +41,15 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 	final int FRAME_HEIGHT = 1000;
 	static int udst = -1;
 	private Image doubleBuffer;
-	public static KML_Logger km=null;
+	public static KML_Logger km = null;
+	private int dt = 185;
 
-	public MyGameAuto(int num_scenario,int id) throws InterruptedException {
+	public MyGameAuto(int num_scenario, int id) throws InterruptedException {
 		Game_Server.login(id);
 		this.game = Game_Server.getServer(num_scenario);
 		graph = new DGraph(game.getGraph());
 		algoGraph = new Graph_Algo(graph);
-		km=new KML_Logger(num_scenario);
+		km = new KML_Logger(num_scenario);
 		turnToGuiLocation(FRAME_WIDTH, FRAME_HEIGHT);
 		for (String f : game.getFruits()) {
 			Fruit ftmp = new Fruit(f);
@@ -63,7 +64,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			int num_robots = robots.getInt("robots");
 			for (int i = 0; i < num_robots; i++) {
 				if (i < this.fruits.size()) {
-					int src = this.fruits.get(i).getEdge().getSrc();
+					int src = this.fruits.get(i).getEdge().getDest();
 					node_data node_src = this.graph.getNode(src);
 					Point3D src_p = node_src.getLocation();
 					game.addRobot(src);
@@ -92,13 +93,18 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		game.startGame();
 		while (game.isRunning()) {
 			time.setText("The clock is ticking: " + game.timeToEnd() / 1000);
-			Thread.sleep(50);
+			Thread.sleep(dt);
+			System.out.println(dt);
 			moveRobots(game, graph);
 			update(getGraphics());
 		}
 		km.kmlEnd();
 		String results = game.toString();
-		JOptionPane.showMessageDialog(this, "Game over: " + results + "\n game saved to data in kml file", "INFORMATION", JOptionPane.INFORMATION_MESSAGE);
+		String remark = km.kmlToString();
+		game.sendKML(remark);
+		System.out.println(remark);
+		JOptionPane.showMessageDialog(this, "Game over: " + results + "\n game saved to data in kml file",
+				"INFORMATION", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void turnToGuiLocation(int width, int height) {
@@ -156,12 +162,21 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 
 						dest = nextNodeR(graph, src);
 						game.chooseNextEdge(robid, dest);
-						//src = src + 1;
+						// src = src + 1;
 					} else if (dest == -1) {
 						current = robid;
 						dest = nextNode(graph, src);
 						game.chooseNextEdge(robid, dest);
 					}
+					for (Fruit f : fruits) {
+						if (this.robots.get(robid).getLocation()
+								.close2equals(graph.getNode(f.getEdge().getDest()).getLocation())
+								|| this.robots.get(robid).getLocation().close2equals(f.getLocation())
+								|| this.robots.get(robid).getLocation()
+										.close2equals(graph.getNode(f.getEdge().getSrc()).getLocation()))
+							dt = 81;
+					}
+
 					this.robots.get(robid).setLocation(new Point3D(pos));
 					km.addPlaceMark("robot", pos);
 
@@ -174,7 +189,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 				Fruit fruit_tmp = new Fruit(fruit);
 				placeFruit(fruit_tmp);
 				fruits.add(fruit_tmp);
-				
+
 			}
 			fruits.sort(comp);
 		}
@@ -182,13 +197,14 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 
 	private int nextNode(graph graph, int src) {
 		synchronized (algoGraph) {
+			dt = 280;
 			Double min = Double.MAX_VALUE;
 			int dest = 0;
 			int key = 0;
 			boolean isGetDest = false;
-			//fruits.sort(comp.reversed());
+			// fruits.sort(comp.reversed());
 			Fruit f = new Fruit();
-			//placeFruit(f);
+			// placeFruit(f);
 			for (int i = 0; i < game.getFruits().size(); i++) {
 				f = fruits.get(game.getFruits().size() - i - 1);
 				placeFruit(f);
@@ -201,24 +217,24 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 					} else {
 						dest = f.getEdge().getSrc();
 					}
-					
+
 				}
 			}
 			if (min == -1)
 				return -1;
 			if (!isGetDest) {
-				//fruits.sort(comp.reversed());
-				//f = new Fruit(fruits.get(0));
+				// fruits.sort(comp.reversed());
+				// f = new Fruit(fruits.get(0));
 				placeFruit(f);
 				if (src == f.getEdge().getSrc()) {
 					dest = f.getEdge().getDest();
 				} else
 					dest = f.getEdge().getSrc();
 			}
-			//fruits.sort(comp.reversed());
+			// fruits.sort(comp.reversed());
 //			f = new Fruit(fruits.get(key));
 //			placeFruit(f);
-			//f.getEdge().setTag(1);
+			// f.getEdge().setTag(1);
 			graph.getEdge(f.getEdge().getDest(), f.getEdge().getSrc()).setTag(1);
 			List<node_data> node = algoGraph.shortestPath(src, dest);
 			Collection<edge_data> c = graph.getE(src);
@@ -277,7 +293,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 	private void drawNodes(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
-		ArrayList<String> locations = new ArrayList<String>(); 
+		ArrayList<String> locations = new ArrayList<String>();
 		for (node_data node : graph.getV()) {
 			double x_gui = scale(node.getLocation().x(), x_toScale[0], x_toScale[1], 50, this.getWidth() - 50);
 			double y_gui = scale(node.getLocation().y(), y_toScale[0], y_toScale[1], 70, this.getHeight() - 70);
@@ -288,7 +304,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			g.setFont(new Font("default", Font.BOLD, 14));
 			g.setColor(Color.BLACK);
 			g.drawString(id, (int) x_gui + 7, ((int) y_gui) + 15);
-			if(node.getLocation().toString() != null) {
+			if (node.getLocation().toString() != null) {
 				km.addPlaceMark("node", node.getLocation().toString());
 				locations.add(node.getLocation().toString());
 			}
@@ -301,7 +317,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		double[] y_toScale = find_min_max_Yaxis();
 
 		for (Fruit fruit : this.fruits) {
-			
+
 			if (fruit.getType() == 1) {
 				/**
 				 * Here put icon of an apple
@@ -482,8 +498,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 		game_service game = Game_Server.getServer(24); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
-		MyGameAuto m = new MyGameAuto(16,999);
-
+		MyGameAuto m = new MyGameAuto(0, 206094815);
 
 		// System.out.println(m.g);
 	}

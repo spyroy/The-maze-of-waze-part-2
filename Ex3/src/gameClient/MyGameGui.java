@@ -89,6 +89,9 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 
 		Menu alg = new Menu("level info");
 		menuBar.add(alg);
+		
+		Menu score = new Menu("HighScore");
+		menuBar.add(score);
 
 		MenuItem item2 = new MenuItem("manual");
 		item2.addActionListener(this);
@@ -97,6 +100,14 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 		MenuItem item3 = new MenuItem("automatic");
 		item3.addActionListener(this);
 		file.add(item3);
+		
+		MenuItem item29 = new MenuItem("personal data");
+		item29.addActionListener(this);
+		score.add(item29);
+		
+		MenuItem item28 = new MenuItem("global data");
+		item28.addActionListener(this);
+		score.add(item28);
 
 		MenuItem item5 = new MenuItem("level 1");
 		item5.addActionListener(this);

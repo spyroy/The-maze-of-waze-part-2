@@ -435,6 +435,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		List<String> log = game.getFruits();
 //		JOptionPane.showMessageDialog((Component) log, "NOPE", "Information", JOptionPane.INFORMATION_MESSAGE);
 		MyGame m = new MyGame(11,9999);
+		System.out.println("zibi");
 
 		// System.out.println(m.g);
 	}
