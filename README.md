@@ -9,18 +9,28 @@ to run this game just open the jar file included in this project (to be icluded 
 
 ## How to play?
 First run the application
+
 ![](https://github.com/spyroy/mtg3/blob/master/Ex3/data/Loginpage.JPG)
 
 Then you need to put your id (you can "fake" it by inserting not real id)
+
+
 ![](https://github.com/spyroy/mtg3/blob/master/Ex3/data/ID.JPG)
 
 You can also look at instructions:
 ### Automatic:
+
+
 ![](https://github.com/spyroy/mtg3/blob/master/Ex3/data/information_automatic.JPG)
 
 ### Manual:
+
+
 ![](https://github.com/spyroy/mtg3/blob/master/Ex3/data/information_manual.JPG)
 
 Under the lable "level info" you can choose any level from [0-23] and message will be displayed:
 Displaying how many robots does a level have, as well as fruits
+
+
+
 ![](https://github.com/spyroy/mtg3/blob/master/Ex3/data/level_info_example.JPG)
