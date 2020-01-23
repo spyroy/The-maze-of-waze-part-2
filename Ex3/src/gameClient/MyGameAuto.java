@@ -62,13 +62,22 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			JSONObject robots = new JSONObject(game.toString());
 			robots = robots.getJSONObject("GameServer");
 			int num_robots = robots.getInt("robots");
+			int j=39;
 			for (int i = 0; i < num_robots; i++) {
-				if (i < this.fruits.size()) {
+				if (i < this.fruits.size())
+				{
 					int src = this.fruits.get(i).getEdge().getDest();
 					node_data node_src = this.graph.getNode(src);
 					Point3D src_p = node_src.getLocation();
+
 					game.addRobot(src);
-				} else {
+					if(j!=20)
+						j=20;
+					else
+						j=2;
+				} 
+				else 
+				{
 					game.addRobot(i);
 				}
 			}
@@ -173,8 +182,8 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 								.close2equals(graph.getNode(f.getEdge().getDest()).getLocation())
 								|| this.robots.get(robid).getLocation().close2equals(f.getLocation())
 								|| this.robots.get(robid).getLocation()
-										.close2equals(graph.getNode(f.getEdge().getSrc()).getLocation()))
-							dt = 81;
+								.close2equals(graph.getNode(f.getEdge().getSrc()).getLocation()))
+							dt = 100;//We need to play with this variable in order to level up the different stages
 					}
 
 					this.robots.get(robid).setLocation(new Point3D(pos));
@@ -197,20 +206,22 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 
 	private int nextNode(graph graph, int src) {
 		synchronized (algoGraph) {
-			dt = 280;
+			dt = 280;//Change it through the levels
 			Double min = Double.MAX_VALUE;
 			int dest = 0;
-			int key = 0;
-			boolean isGetDest = false;
+			int key=0;
+			boolean b = false;
+			//Sometimes fruits.sort is used
 			// fruits.sort(comp.reversed());
 			Fruit f = new Fruit();
 			// placeFruit(f);
 			for (int i = 0; i < game.getFruits().size(); i++) {
 				f = fruits.get(game.getFruits().size() - i - 1);
 				placeFruit(f);
-				if (f.getEdge().getTag() == 0 && algoGraph.shortestPathDist(src, f.getEdge().getSrc()) < min) {
-					key = i;
-					isGetDest = true;
+				if (f.getEdge().getTag() == 0 && algoGraph.shortestPathDist(src, f.getEdge().getSrc()) < min) 
+				{
+					key=i;
+					b = true;
 					min = algoGraph.shortestPathDist(src, f.getEdge().getDest());
 					if (src == f.getEdge().getSrc()) {
 						dest = f.getEdge().getDest();
@@ -222,7 +233,7 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 			}
 			if (min == -1)
 				return -1;
-			if (!isGetDest) {
+			if (!b) {
 				// fruits.sort(comp.reversed());
 				// f = new Fruit(fruits.get(0));
 				placeFruit(f);
@@ -232,8 +243,8 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 					dest = f.getEdge().getSrc();
 			}
 			// fruits.sort(comp.reversed());
-//			f = new Fruit(fruits.get(key));
-//			placeFruit(f);
+			//			f = new Fruit(fruits.get(key));
+			//			placeFruit(f);
 			// f.getEdge().setTag(1);
 			graph.getEdge(f.getEdge().getDest(), f.getEdge().getSrc()).setTag(1);
 			List<node_data> node = algoGraph.shortestPath(src, dest);
@@ -495,10 +506,10 @@ public class MyGameAuto extends JFrame implements ActionListener, MouseListener 
 
 	public static void main(String[] a) throws InterruptedException {
 
-		game_service game = Game_Server.getServer(24); // you have [0,23]
+		//		game_service game = Game_Server.getServer(24); // you have [0,23]
 		// games
 		// System.out.println(game.getGraph());
-		MyGameAuto m = new MyGameAuto(0, 206094815);
+		MyGameAuto m = new MyGameAuto(4, 315524389);
 
 		// System.out.println(m.g);
 	}
