@@ -3,7 +3,9 @@ package gameClient;
 import java.util.Comparator;
 
 
-
+/**
+ * this class represent the comparator for fruits, meaning it compares their values
+ */
 public class FruitComperator implements Comparator<Fruit>{
 
 	@Override

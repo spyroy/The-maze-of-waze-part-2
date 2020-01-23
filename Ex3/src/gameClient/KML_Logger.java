@@ -1,12 +1,19 @@
 package gameClient;
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+/**
+ * this class takes the result of a game and saves it to kml 
+ * file, the saving will be done automatically after games end
+ * @author spyro
+ *
+ */
 public class KML_Logger {
 
 	private int stage;
@@ -20,9 +27,10 @@ public class KML_Logger {
 	}
 
 	/**
-	 * Concat the opening string for the KML file. Sets the elements of the game
-	 * such as: node, fruit and robot that will be added as a placemark to the KML
-	 * file.
+	 * the start for every kml file
+	 * has the logo of purple circle for node
+	 * yellow star for banana
+	 * and red star for apple
 	 */
 	public void kmlStart() {
 		info.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
@@ -45,6 +53,12 @@ public class KML_Logger {
 				+ "      </IconStyle>\r\n" + "    </Style>");
 	}
 
+	/**
+	 * place a mark on location
+	 * given from the game for every element
+	 * @param id
+	 * @param location
+	 */
 	public void addPlaceMark(String id, String location) {
 
 		DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -58,6 +72,9 @@ public class KML_Logger {
 
 	}
 
+	/**
+	 * should do a path between all nodes
+	 */
 	public void addLineString(ArrayList<String> locations) {
 		if (locations != null)
 
@@ -70,7 +87,9 @@ public class KML_Logger {
 	}
 
 	
-
+/**
+ * the of every kml file
+ */
 	public void kmlEnd() {
 		info.append("  \r\n</Document>\r\n" + "</kml>");
 		try {
@@ -84,6 +103,10 @@ public class KML_Logger {
 		}
 	}
 	
+	/**
+	 * kml to string
+	 * @return
+	 */
 	public String kmlToString() {
 		return info.toString();
 	}

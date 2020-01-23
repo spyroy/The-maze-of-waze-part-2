@@ -23,6 +23,11 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
+/**
+ * this class represent the manual mode in the game
+ * @author spyro
+ *
+ */
 public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	public static final double EPS1 = 0.001, EPS2 = Math.pow(EPS1, 2);
@@ -37,6 +42,12 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 	private Image doubleBuffer;
 	public static KML_Logger km=null;
 
+	/**
+	 * initial manual game
+	 * @param num_scenario
+	 * @param id
+	 * @throws InterruptedException
+	 */
 	public MyGame(int num_scenario, int id) throws InterruptedException {
 		Game_Server.login(id);
 		game_service game = Game_Server.getServer(num_scenario);
@@ -56,7 +67,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 			int num_robots = robots.getInt("robots");
 			for (int i = 0; i < num_robots; i++) {
 				if (i < this.fruits.size()) {
-					int src = this.fruits.get(i).getEdge().getSrc();
+					int src = this.fruits.get(i).getEdge().getDest();
 					node_data node_src = this.graph.getNode(src);
 					Point3D src_p = node_src.getLocation();
 					game.addRobot(src);
@@ -104,6 +115,10 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	}
 
+	/**
+	 * place the fruits on the gui map
+	 * @param f
+	 */
 	private void placeFruit(Fruit f) {
 		for (node_data n : this.graph.getV()) {
 			for (edge_data e : this.graph.getE(n.getKey())) {
@@ -127,6 +142,11 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * move the robots to their next node
+	 * @param game
+	 * @param graph
+	 */
 	private void moveRobots(game_service game, graph graph) {
 		List<String> path = game.move();
 		List<String> robots = game.getRobots();
@@ -172,6 +192,14 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * choose the next node for every robot
+	 * by clicking the mouse and choose node id
+	 * @param graph
+	 * @param src
+	 * @param dst
+	 * @return
+	 */
 	private int nextNode(graph graph, int src, int dst) {
 		node_data n_src = this.graph.getNode(src);
 		for (edge_data e : this.graph.getE(src)) {
@@ -181,6 +209,12 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		return -1;
 	}
 
+	/**
+	 * random next node
+	 * @param g
+	 * @param src
+	 * @return
+	 */
 	private static int nextNodeR(graph g, int src) {
 		int ans = -1;
 		Collection<edge_data> ee = g.getE(src);
@@ -196,6 +230,9 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		return ans;
 	}
 
+	/**
+	 * update the paint
+	 */
 	public void update(Graphics g) {
 		Dimension size = getSize();
 		if (doubleBuffer == null || doubleBuffer.getWidth(this) != size.width
@@ -219,6 +256,10 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		super.paintComponents(g);
 	}
 
+	/**
+	 * draw the nodes on the gui graph
+	 * @param g
+	 */
 	private void drawNodes(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
@@ -241,6 +282,10 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		km.addLineString(locations);
 	}
 
+	/**
+	 * draw the fruits
+	 * @param g
+	 */
 	private void drawFruits(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
@@ -273,6 +318,10 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * draw the edges
+	 * @param g
+	 */
 	private void drawEdges(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
@@ -306,6 +355,10 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * draw the robots
+	 * @param g
+	 */
 	private void drawRobots(Graphics2D g) {
 		double[] x_toScale = find_min_max_Xaxis();
 		double[] y_toScale = find_min_max_Yaxis();
@@ -320,6 +373,9 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		}
 	}
 
+	/**
+	 * paint function
+	 */
 	public void paint(Graphics graphics) {
 		super.paint(graphics);
 		BufferedImage buffer = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
@@ -339,6 +395,11 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	}
 
+	/**
+	 * find the min between all x points
+	 * used for scale
+	 * @return
+	 */
 	private double[] find_min_max_Xaxis() {
 		double[] x_scale = new double[2];
 		double min = Double.MAX_VALUE;
@@ -362,6 +423,11 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	}
 
+	/**
+	 * find the min between all y points
+	 * used for scale
+	 * @return
+	 */
 	private double[] find_min_max_Yaxis() {
 		double[] y_scale = new double[2];
 		double min = Double.MAX_VALUE;
@@ -385,6 +451,15 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 
 	}
 
+	/**
+	 * converts the points to be matched on the gui window
+	 * @param data
+	 * @param r_min
+	 * @param r_max
+	 * @param t_min
+	 * @param t_max
+	 * @return
+	 */
 	private double scale(double data, double r_min, double r_max, double t_min, double t_max) {
 		double res = ((data - r_min) / (r_max - r_min)) * (t_max - t_min) + t_min;
 		return res;
@@ -434,7 +509,7 @@ public class MyGame extends JFrame implements ActionListener, MouseListener {
 		// System.out.println(game.getGraph());
 		List<String> log = game.getFruits();
 //		JOptionPane.showMessageDialog((Component) log, "NOPE", "Information", JOptionPane.INFORMATION_MESSAGE);
-		MyGame m = new MyGame(11,9999);
+		MyGame m = new MyGame(20,9999);
 		System.out.println("zibi");
 
 		// System.out.println(m.g);

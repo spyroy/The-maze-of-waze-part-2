@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +39,12 @@ import gui.Graph_Gui;
 import utils.Point3D;
 import utils.StdDraw;
 
+/**
+ * this class represents the main window on the game
+ * it has 
+ * @author spyro
+ *
+ */
 public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 
 	private graph graph;
@@ -409,42 +416,74 @@ public class MyGameGui extends JFrame implements ActionListener, MouseListener {
 			}
 			break;
 		case "personal data":
+			String r = JOptionPane.showInputDialog(this, "enter id", "INFORMATION",
+					JOptionPane.INFORMATION_MESSAGE);
+			personal(Integer.parseInt(r));
 			break;
+		case "global data":
+			String l = JOptionPane.showInputDialog(this, "enter stage", "INFORMATION",
+					JOptionPane.INFORMATION_MESSAGE);
+			highscore(Integer.parseInt(l));
 
 		}
 
 	}
 	
+    private void highscore(int stage) {
+        String[] Names = { "UserID", "LevelID", "score", "moves", "time" };
+        JFrame frame = new JFrame("Stage "+stage);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        DefaultTableModel tableModel = new DefaultTableModel();
+        for (String Name : Names) {
+            tableModel.addColumn(Name);
+        }
+        TreeMap<String, String> tp = MyDB.globalBest(stage);
+        for (Map.Entry<String, String> entry : tp.entrySet()) {
+            tableModel.addRow(entry.getValue().split(","));
+        }
+
+        JTable table = new JTable(tableModel);
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        frame.add(scroll);
+        frame.setSize(1000, 1000);
+        frame.setVisible(true);
+    }
+
+    
+    private void personal(int id) {
+        String[] Names = { "UserID", "LevelID", "score", "moves", "time" };
+        JFrame frame = new JFrame("Games Played: " + MyDB.NumOfGames(id));
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        DefaultTableModel tableModel = new DefaultTableModel();
+        for (String Name : Names) {
+            tableModel.addColumn(Name);
+        }
+        TreeMap<Integer, String> tp = MyDB.personalBest(id);
+        for (Map.Entry<Integer, String> entry : tp.entrySet()) {
+            tableModel.addRow(entry.getValue().split(","));
+        }
+
+        JTable table = new JTable(tableModel);
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        frame.add(scroll);
+        frame.setSize(1000, 1000);
+        frame.setVisible(true);
+    }
+
 	
 	
-
-
-//	public MyGameGui(graph b, int scenerio) {
-//		graph g = new DGraph();
-//		for (node_data n : b.getV()) {
-//			Point3D p = n.getLocation();
-//			node h = new node(n.getKey(), p, n.getWeight());
-//			g.addNode(h);
-//		}
-//		for (node_data n : b.getV()) {
-//			for (edge_data e : b.getE(n.getKey())) {
-//				g.connect(e.getSrc(), e.getDest(), e.getWeight());
-//			}
-//		}
-//		Graph_Gui a = new Graph_Gui(g);
-//		a.setVisible(true);
-//
-//	}
-
-
-
 
 	public static void main(String[] args) {
 		graph g = new DGraph();
 		MyGameGui a = new MyGameGui();
 		a.setVisible(true);
-//		game_service gs = Game_Server.getServer(1);
-//		System.out.println(gs);
+
 	}
 
 }
