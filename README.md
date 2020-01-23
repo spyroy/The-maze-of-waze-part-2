@@ -34,4 +34,5 @@ Displaying how many robots does a level have, as well as fruits
 
 
 ![](https://github.com/spyroy/mtg3/blob/master/Ex3/data/level_info_example.JPG)
-autors Or Mendel and Matan Greenberg
+
+authors Or Mendel and Matan Greenberg
